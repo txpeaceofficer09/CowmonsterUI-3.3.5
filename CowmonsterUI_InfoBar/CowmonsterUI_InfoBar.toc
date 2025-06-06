@@ -1,0 +1,25 @@
+## Interface: 30300
+## Title: CowmonsterUI_InfoBar
+## Notes: An information bar for CowmonsterUI.
+## Author: Cowmonster (http://www.wowinterface.com)
+## Version: 1.0.3
+## Dependencies: CowmonsterUI
+## SavedVariables: RecordsDB
+Money.lua
+XP.lua
+Memory.lua
+--LFG.lua
+--Avoidance.lua
+SpellBonus.lua
+--Professions.lua
+Latency.lua
+FrameRate.lua
+Clock.lua
+--MicroMenu.lua
+Bags.lua
+Guild.lua
+--Records.lua
+--DPS.lua
+Coords.lua
+Core.lua
+--Mail.lua

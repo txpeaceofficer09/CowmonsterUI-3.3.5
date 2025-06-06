@@ -1,0 +1,8 @@
+## Interface: 30300
+## Title: CowmonsterUI
+## Notes: A collection of interface modifications..
+## Author: Cowmonster (http://www.wowinterface.com)
+## Version: 1.0.3
+## SavedVariables: CowmonsterUIDB
+Core.lua
+Functions.lua
