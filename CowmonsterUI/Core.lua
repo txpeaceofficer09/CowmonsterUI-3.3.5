@@ -21,10 +21,14 @@ local function OnEvent(self, event, ...)
 		ActionBarDownButton:Hide()
 
 		--MainMenuBarPerformanceBarFrame:Hide()
-		MainMenuBarTexture0:Hide()
-		MainMenuBarTexture1:Hide()
-		MainMenuBarTexture2:Hide()
-		MainMenuBarTexture3:Hide()
+		--MainMenuBarTexture0:Hide()
+		--MainMenuBarTexture1:Hide()
+		--MainMenuBarTexture2:Hide()
+		--MainMenuBarTexture3:Hide()
+		for i=0,3,1 do
+			_G["MainMenuBarTexture"..i]:Hide()
+		end
+		MainMenuBarPageNumber:Hide()
 		SlidingActionBarTexture0:Hide()
 		SlidingActionBarTexture1:Hide()
 

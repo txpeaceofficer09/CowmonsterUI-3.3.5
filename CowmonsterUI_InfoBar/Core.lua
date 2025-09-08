@@ -295,47 +295,77 @@ function InfoBarSetText(i, format, ...)
 end
 
 function f.OnEvent(self, event, ...)
-	if event == "VARIABLES_LOADED" then
+	if event == "VARIABLES_LOADED" or event == "PLAYER_ENTERING_WORLD" then
 		CowmonsterUIDB[GetRealmName()] = CowmonsterUIDB[GetRealmName()] or {}
 		CowmonsterUIDB[GetRealmName()][UnitName("player")] = CowmonsterUIDB[GetRealmName()][UnitName("player")] or {["Settings"]={}}
 
 		--self:SetPoint("CENTER", UIParent, "CENTER", 0, 10-(GetScreenHeight()/2))
 		--if not IsAddOnLoaded("CowmonsterUI_ActionBars") then
-			MainMenuBar:ClearAllPoints()
-			MainMenuBar:SetPoint("BOTTOM", UIParent, "BOTTOM", 60, 20)
+			--MainMenuBar:ClearAllPoints()
+			--MainMenuBar:SetPoint("BOTTOM", UIParent, "BOTTOM", 60, 20)
 
 			--for i=1,12,1 do
-			--	_G[("ActionButton%d"):format(i)]:SetParent(UIParent)
+			--	if i == 1 then
+			--		_G["MultiBarLeftButton"..i]:ClearAllPoints()
+			--		_G["MultiBarLeftButton"..i]:SetPoint("LEFT", ActionButton12, "RIGHT", 14, 0)
+			--	else
+			--		_G["MultiBarLeftButton"..i]:ClearAllPoints()
+			--		_G["MultiBarLeftButton"..i]:SetPoint("LEFT", _G["MultiBarLeftButton"..(i-1)], "RIGHT", 6, 0)
+			--	end
+
+			--	_G["MultiBarRightButton"..i]:ClearAllPoints()
+			--	_G["MultiBarRightButton"..i]:SetPoint("BOTTOM", _G["MultiBarBottomRightButton"..i], "TOP", 0, 4)
 			--end
 
-			--[[
-			local kids = { MainMenuBarArtFrame:GetChildren() }
-			for _, kid in pairs(kids) do
-				kid:SetParent(UIParent)
-			end
+			--local microButtons = {
+			--	CharacterMicroButton,
+			--	SpellbookMicroButton,
+			--	TalentMicroButton,
+			--	AchievementMicroButton,
+			--	QuestLogMicroButton,
+			--	SocialsMicroButton,
+			--	PVPMicroButton,
+			--	MainMenuMicroButton,
+			--	HelpMicroButton
+			--}
 
-			MainMenuBarArtFrame:Hide()
-			]]
+			--for i=1, #microButtons do
+			--	local button, previousButton = microButtons[i], microButtons[i-1]
 
-			self.menuOffsetLeft = MainMenuBar:GetLeft()
-			self.menuOffsetBottom = MainMenuBar:GetBottom()
+			--	button:ClearAllPoints()
+			--	if i == 1 then
+			--		button:SetPoint("BOTTOMRIGHT", MainMenuBarBackpackButton, "TOPRIGHT", 0, 4)
+			--	else
+			--		button:SetPoint("RIGHT", previousButton, "LEFT", -4, 0)
+			--	end
+			--end
+
+			--MainMenuBarBackpackButton:ClearAllPoints()
+			--MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 20)
+
+			--MainMenuBarPerformanceBarFrame:Hide()
+			--MainMenuBarPerformanceBar:Hide()
+
+			--self.menuOffsetLeft = MainMenuBar:GetLeft()
+			--self.menuOffsetBottom = MainMenuBar:GetBottom()
 		--end
 	end
 end
 
 f:RegisterEvent("VARIABLES_LOADED")
+f:RegisterEvent("PLAYER_ENTERING_WORLD")
 f:SetScript("OnEvent", f.OnEvent)
 
 f:SetScript("OnUpdate", function(self, elapsed)
 	self.timer = (self.timer or 0) + elapsed
-	self.menuOffsetLeft = self.menuOffsetLeft or 0
-	self.menuOffsetBottom = self.menuOffsetBottom or 0
+	--self.menuOffsetLeft = self.menuOffsetLeft or 0
+	--self.menuOffsetBottom = self.menuOffsetBottom or 0
 
 	if self.timer >= 1 then
-		if MainMenuBar:GetLeft() ~= self.menuOffsetLeft or MainMenuBar:GetBottom() ~= self.menuOffsetBottom then
-			MainMenuBar:ClearAllPoints()
-			MainMenuBar:SetPoint("BOTTOM", UIParent, "BOTTOM", 60, 20)
-		end
+	--	if MainMenuBar:GetLeft() or 0 ~= self.menuOffsetLeft or MainMenuBar:GetBottom() or 0 ~= self.menuOffsetBottom() then
+	--		MainMenuBar:ClearAllPoints()
+	--		MainMenuBar:SetPoint("BOTTOM", UIParent, "BOTTOM", 60, 20)
+	--	end
 
 		self.timer = 0
 	end

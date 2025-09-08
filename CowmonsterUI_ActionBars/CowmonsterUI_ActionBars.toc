@@ -1,0 +1,8 @@
+## Interface: 30300
+## Title: CowmonsterUI_ActionBars
+## Notes: Customize the main bar and the action bars.
+## DefaultState: enabled
+## Author: SoonBeSteak (https://www.trap-nine.com)
+## Version: 1.1.0
+## Dependencies: CowmonsterUI
+Core.lua
