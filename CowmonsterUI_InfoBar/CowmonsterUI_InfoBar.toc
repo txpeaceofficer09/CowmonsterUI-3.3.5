@@ -2,7 +2,7 @@
 ## Title: CowmonsterUI_InfoBar
 ## Notes: An information bar for CowmonsterUI.
 ## Author: Cowmonster (http://www.wowinterface.com)
-## Version: 1.0.3
+## Version: 1.0.4
 ## Dependencies: CowmonsterUI
 ## SavedVariables: RecordsDB
 Money.lua
@@ -23,3 +23,4 @@ Guild.lua
 Coords.lua
 Core.lua
 --Mail.lua
+
