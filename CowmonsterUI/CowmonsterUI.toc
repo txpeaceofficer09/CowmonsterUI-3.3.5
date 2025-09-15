@@ -2,7 +2,8 @@
 ## Title: CowmonsterUI
 ## Notes: A collection of interface modifications..
 ## Author: Cowmonster (http://www.wowinterface.com)
-## Version: 1.0.3
+## Version: 1.0.4
 ## SavedVariables: CowmonsterUIDB
 Core.lua
 Functions.lua
+
