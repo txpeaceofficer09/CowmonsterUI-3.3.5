@@ -3,6 +3,6 @@
 ## Notes: Customize the main bar and the action bars.
 ## DefaultState: enabled
 ## Author: SoonBeSteak (https://www.trap-nine.com)
-## Version: 1.1.0
+## Version: 1.0.4
 ## Dependencies: CowmonsterUI
 Core.lua
