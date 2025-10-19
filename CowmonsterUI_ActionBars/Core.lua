@@ -149,7 +149,7 @@ local function OnEvent(self, event, ...)
 		BINDING_NAME_EXTRABARBUTTON10 = "Button 10"
 		BINDING_NAME_EXTRABARBUTTON11 = "Button 11"
 		BINDING_NAME_EXTRABARBUTTON12 = "Button 12"
-	elseif event == "ADDON_LOADED" and ... == addonName then
+	elseif event == "ADDON_LOADED" then
 		if IsAddOnLoaded("CowmonsterUI_InfoBar") then
 			ACTIONBAR_OFFSETY = 20
 
