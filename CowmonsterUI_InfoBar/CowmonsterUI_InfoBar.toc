@@ -8,7 +8,7 @@
 Money.lua
 XP.lua
 Memory.lua
---LFG.lua
+LFG.lua
 --Avoidance.lua
 SpellBonus.lua
 --Professions.lua

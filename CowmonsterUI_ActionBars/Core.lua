@@ -114,6 +114,7 @@ local function OnEvent(self, event, ...)
 			AchievementMicroButton,
 			QuestLogMicroButton,
 			SocialsMicroButton,
+			LFDMicroButton,
 			PVPMicroButton,
 			MainMenuMicroButton,
 			HelpMicroButton
