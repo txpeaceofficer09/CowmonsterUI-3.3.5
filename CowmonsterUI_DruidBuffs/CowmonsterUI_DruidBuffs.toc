@@ -1,0 +1,5 @@
+## Interface: 30300
+## Author: SoonBeSteak
+## Title: CowmonsterUI_DruidBuffs
+## Notes: Keep track of your debuffs on your target and your personal buffs.
+Core.lua

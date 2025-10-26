@@ -8,6 +8,12 @@ CowmonsterUIDB = {
 	},
 }
 
+--[[
+hooksecurefunc("SetCVar", function(varName, varVal)
+	print(varName, varVal)
+end)
+]]
+
 local f = CreateFrame("Frame", "CowmonsterUI", UIParent)
 
 local function OnEvent(self, event, ...)
@@ -16,6 +22,8 @@ local function OnEvent(self, event, ...)
 		--UIParent:SetScale(1)
 		MainMenuBarLeftEndCap:Hide()
 		MainMenuBarRightEndCap:Hide()
+
+		SetCVar("alwaysShowActionBars", 1)
 
 		ActionBarUpButton:Hide()
 		ActionBarDownButton:Hide()

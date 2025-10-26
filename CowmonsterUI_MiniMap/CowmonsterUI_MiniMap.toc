@@ -1,0 +1,8 @@
+## Interface: 30300
+## Title: CowmonsterUI_MiniMap
+## Notes: Customize the minimap.
+## DefaultState: enabled
+## Author: SoonBeSteak (https://www.trap-nine.com)
+## Version: 1.0.4
+## Dependencies: CowmonsterUI
+Core.lua
