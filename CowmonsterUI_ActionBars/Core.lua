@@ -2,6 +2,7 @@ local f = CreateFrame("Frame", nil, UIParent)
 
 local ACTIONBAR_OFFSETX = 60
 local ACTIONBAR_OFFSETY = 0
+local BAG_OFFSETY = 20
 
 hooksecurefunc(PetActionBarFrame, "SetPoint", function(self)
 	for i=1,10,1 do
@@ -127,12 +128,12 @@ local function OnEvent(self, event, ...)
 			if i == 1 then
 				button:SetPoint("BOTTOMRIGHT", MainMenuBarBackpackButton, "TOPRIGHT", 0, 4)
 			else
-				button:SetPoint("RIGHT", previousButton, "LEFT", -4, 0)
+				button:SetPoint("RIGHT", previousButton, "LEFT", -2, 0)
 			end
 		end
 
 		MainMenuBarBackpackButton:ClearAllPoints()
-		MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 20)
+		MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, BAG_OFFSETY)
 
 		self.menuOffsetLeft = MainMenuBar:GetLeft()
 		self.menuOffsetBottom = MainMenuBar:GetBottom()
@@ -155,6 +156,13 @@ local function OnEvent(self, event, ...)
 			ACTIONBAR_OFFSETY = 20
 
 			--self:UnregisterEvent("ADDON_LOADED")
+		end
+
+		if IsAddOnLoaded("CowmonsterUI_MiniMap") then
+			BAG_OFFSETY = 170
+
+			MainMenuBarBackpackButton:ClearAllPoints()
+			MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, BAG_OFFSETY)
 		end
 
 		ActionBarUpButton:Disable()

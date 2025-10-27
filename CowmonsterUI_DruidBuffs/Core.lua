@@ -74,7 +74,7 @@ end
 local function OnUpdate(self, elapsed)
 	self.timer = (self.timer or 0) + elapsed
 
-	if ( self.timer >= 0.2 then
+	if ( self.timer >= 0.2 ) then
 		if self.startTime ~= nil and self.endTime ~= nil then
 			local duration = self.endTime - GetTime()
 

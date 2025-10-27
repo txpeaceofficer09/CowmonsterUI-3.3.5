@@ -8,13 +8,13 @@ f:EnableKeyboard(false)
 f:EnableMouse(true)
 f:EnableMouseWheel(true)
 
---f:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 20)
+f:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 20)
 --f:SetPoint("BOTTOMLEFT", ActionBar2, "BOTTOMRIGHT", 4, -2)
---f:SetHeight(150)
-f:SetAllPoints(TabParent)
+--f:SetPoint("BOTTOMLEFT", MultiBarLeft, "BOTTOMRIGHT", 4, 0)
+f:SetHeight(150)
+f:SetWidth(345)
+--f:SetAllPoints(TabParent)
 f:SetBackdrop( { bgFile = "Interface\\DialogFrame\\UI-DialogBox-BackGround-Dark", edgeFile = nil, tile = true, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
-
-CreateTab(MapFrame)
 
 local sc = CreateFrame("Frame", "MapFrameSC", MapFrame)
 
@@ -39,7 +39,22 @@ end
 sc:SetBackdrop( { bgFile = "Interface\\DialogFrame\\UI-DialogBox-BackGround-Dark", edgeFile = nil, tile = true, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
 sc:Show()
 
-f:Hide()
+--f:Hide()
+f:Show()
+
+local function IsInCity()
+    local channels = {GetChannelList()}
+    
+    for i = 1, #channels, 2 do
+        local id, name = channels[i], channels[i+1]
+
+        if string.find(name, "Trade") then
+            return true
+        end
+    end
+
+    return false 
+end
 
 --CreateFrame("Frame", "MapFlag1", MapFrameSC, "WorldMapFlagTemplate", 1)
 --CreateFrame("Frame", "MapFlag2", MapFrameSC, "WorldMapFlagTemplate", 2)
@@ -256,9 +271,9 @@ local function OnEvent(self, event, ...)
 		MinimapCluster:Hide()
 		MapFrameSC:SetSize(1002, 668)
 		self:SetScrollChild(MapFrameSC)
-		MapFrameTab:Click()
 		MoveMinimapButtons()
-		Minimap:SetMaskTexture("Interface\\AddOns\\CombatMeters\\Mask.blp")
+		Minimap:SetMaskTexture("Interface\\AddOns\\CowmonsterUI_MiniMap\\Mask.blp")
+		self:Show()
 	elseif event == "WORLD_MAP_UPDATE" or event == "ZONE_CHANGED" or event == "ZONE_CHANGED_INDOORS" or event == "WORLD_MAP_NAME_UPDATE" then
 		MapFrame_UpdateTextures()
 	elseif event == "RAID_ROSTER_UPDATE" or event == "PARTY_MEMBERS_CHANGED" then
