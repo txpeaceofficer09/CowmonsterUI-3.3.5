@@ -5,98 +5,145 @@ buffFrame:SetPoint("CENTER", UIParent, "CENTER", 0, -100) -- Adjust position as 
 buffFrame:SetMovable(true)
 
 local spells = {
-	--"Barkskin", -- 22812
-	--"Mangle (Cat)", -- 33983
-	--"Mangle (Bear)", -- 33987
-	--"Bash", -- 8983
-	--"Rake", -- 48573
-	--"Rip", -- 49799
-	"Maim",
-	--"Faerie Fire (Feral)", -- 16857
-	"Faerie Fire",
-	"Nature's Grasp",
-	"Entangling Roots",
-	"Cyclone",
-	--"Lacerate", -- 48567
-	"Berserk",
-	"Demoralizing Roar",
-	"Challenging Roar",
-	--"Growl", -- 6795
-	"Enrage",
-	"Tiger's Fury",
-	"Pounce",
-	"Innervate" -- Make an addon to whisper people when you cast a buff and when it fades.
+	53307, -- Thorns
+	22812, -- Barkskin
+	--33983, -- Mangle (Cat)
+	--33987, -- Mangle (Bear)
+	8983, -- Bash
+	48573, -- Rake
+	49799, -- Rip
+	--"Maim",
+	16857, -- Faerie Fire (Feral)
+	770, --"Faerie Fire",
+	--"Nature's Grasp",
+	--"Entangling Roots",
+	--"Cyclone",
+	--48567, -- Lacerate
+	--"Berserk",
+	--"Demoralizing Roar",
+	--"Challenging Roar",
+	--6795, -- Growl
+	--"Enrage",
+	--"Tiger's Fury",
+	--"Pounce",
+	2893, -- Abolish Poison
+	29166, --"Innervate" -- Make an addon to whisper people when you cast a buff and when it fades.
+	69369, -- Predator's Swiftness
+	48450, -- Lifebloom
+	48440, -- Rejuvenation
+	48442, -- Regrowth
 }
 
 local ACTIVE_ALPHA = 1
 local INACTIVE_ALPHA = 0.25
 
--- Function to create a buff button
-local function CreateBuffButton(parent, name, size, xOffset, spellID, duration)
-	local texture = select(2, GetSpellInfo(spellID))
+local function GetUnitByGUID(guid)
+	if UnitGUID("player") == guid then
+		return "player"
+	end
 
-	texture = string.gsub(texture, "\\", "\\\\");
+	if UnitGUID("playerpet") == guid then
+		return "playerpet"
+	end
+	
+	if UnitGUID("target") == guid then
+		return "target"
+	end
+	
+	if UnitGUID("targetpet") == guid then
+		return "targetpet"
+	end
+	
+	if UnitGUID("focus") == guid then
+		return "focus"
+	end
 
-	local button = CreateFrame("Frame", name, parent)
-	button:SetSize(size, size)
-	button:SetPoint("LEFT", parent, "LEFT", xOffset, 0)
-	--button:SetMovable(true)
-	button:EnableMouse(true)
-	button:RegisterForDrag("LeftButton")
-	button:SetScript("OnDragStart", function(self) self:GetParent():StartMoving() end)
-	button:SetScript("OnDragStop", function(self) self:GetParent():StopMovingOrSizing() end)
-	button:SetAlpha(INACTIVE_ALPHA)
-	button.spellID = spellID
-	button.duration = duration
+	if UnitGUID("focustarget") == guid then
+		return "focustarget"
+	end
+	
+	if UnitGUID("focuspet") == guid then
+		return "focuspet"
+	end
 
-	button.icon = button:CreateTexture(nil, "ARTWORK")
-	button.icon:SetSize(size-4, size-4)
-	button.icon:SetPoint("CENTER", button, "CENTER", 0, 0)
-	button.icon:SetTexture(texture)
-
-	-- Cooldown Text (optional, for displaying remaining time)
-	button.cooldownText = button:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
-	button.cooldownText:SetPoint("CENTER", button, "CENTER", 0, 0)
-	button.cooldownText:SetJustifyH("CENTER")
-	button.cooldownText:SetTextColor(0, 1, 0, 1)
-	button.cooldownText:SetText("") -- Initially empty
-
-	button:SetScript("OnUpdate", OnUpdate)
-	button:SetScript("OnEvent", OnEvent)
-
-	button:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-
-	print("Created "..name)
-
-	button:Show()
-
-	return button
+	for i=1,40,1 do
+		if UnitGUID("party"..i) and UnitGUID("party"..i) == guid then
+			return "party"..i
+		elseif UnitGUID("party"..i.."target") and UnitGUID("party"..i.."target") == guid then
+			return "party"..i.."target"
+		elseif UnitGUID("party"..i.."pet") and UnitGUID("party"..i.."pet") == guid then
+			return "party"..i.."pet"
+		elseif UnitGUID("raid"..i) and UnitGUID("raid"..i) == guid then
+			return "raid"..i
+		elseif UnitGUID("raid"..i.."target") and UnitGUID("raid"..i.."target") == guid then
+			return "raid"..i.."target"
+		elseif UnitGUID("raid"..i.."pet") and UnitGUID("raid"..i.."pet") == guid then
+			return "raid"..i.."pet"
+		end		
+	end
+	
+	return nil
 end
 
-buffFrame:SetScript("OnEvent", function(self, event, ...)
-	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		local _, subEvent, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellID, spellName = ...
+local function GetAuraInfo(unit, spellID)
+	local spellName = GetSpellInfo(spellID)
+	
+	for i=1,40,1 do
+		local name, _, _, stacks, _, duration, expirationTime = UnitBuff(unit, i)
+		if name ~= spellName then
+			name, _, _, stacks, _, duration, expirationTime = UnitDebuff(unit, i)
+		end
 
-		if srcGUID == UnitGUID("player") then
-			if subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH" then
-				if tContains(spells, spellName) then
-					print(spellName, spellID)
-				end
+		if name == spellName then
+			if duration and expirationTime then
+				local remaining = expirationTime - GetTime();
+				return duration, remaining, stacks
 			end
 		end
 	end
-end)
+	
+	return nil, nil, nil
+end
+
+local function GetSpellTexture(spellID)
+	local _, _, texture = GetSpellInfo(spellID)
+	
+	--return texture:gsub("\\", "\\\\")
+	return texture
+end
 
 local function OnEvent(self, event, ...)
+	--self.icon:SetTexture(GetSpellTexture(self.spellID))
+
+	--print(event, ...)
+
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		local _, subEvent, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellID, spellName = ...
 
 		if srcGUID == UnitGUID("player") then
-			if subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH" then
+			if subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_APPLIED_DOSE" or subEvent == "SPELL_AURA_REFRESH" then
 				if spellID == self.spellID then
+					local unit = GetUnitByGUID(dstGUID)
+
 					self:SetAlpha(ACTIVE_ALPHA)
 					self.startTime = GetTime()
-					self.endTime = self.startTime + self.duration
+					
+					if unit ~= nil then
+						local duration, endTime, stacks = GetAuraInfo(unit, spellID)
+						--print(unit, duration, endTime)
+						if endTime ~= nil then
+							self.endTime = self.startTime + endTime
+						elseif duration ~= nil then
+							self.endTime = self.startTime + duration
+						end
+						if ( stacks or 0 ) > 0 then
+							self.stackText:SetText(stacks)
+						else
+							self.stackText:SetText("")
+						end
+					end
+
+					--self.endTime = self.startTime + self.duration
 				end
 			elseif subEvent == "SPELL_AURA_REMOVED" then
 				self:SetAlpha(INACTIVE_ALPHA)
@@ -113,19 +160,88 @@ local function OnUpdate(self, elapsed)
 	if ( self.timer >= 0.2 ) then
 		if self.startTime ~= nil and self.endTime ~= nil then
 			local duration = self.endTime - GetTime()
+			--local stacks = select(4, GetSpellInfo(self.spellID))
 
 			self.cooldownText:SetText(("%.1f"):format(duration))
+			--self.stackText:SetText(stacks)
 		else
 			self.cooldownText:SetText("")
+			self.stackText:SetText("")
 		end
 	end
 end
 
-if UnitClass("player") == "Druid" then
-	print("Loaded DruidBuffs")
-	buffFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+-- Function to create a buff button
+local function CreateBuffButton(parent, size, xOffset, spellID)
+	local spellName = GetSpellInfo(spellID)
 
-	CreateBuffButton(buffFrame, "BarkskinButton", 64, 0, 22812, 12)
+	local buttonName = ("%sFrame"):format(spellName:gsub("\'", ""):gsub(" ", ""))
+
+	local button = CreateFrame("Frame", buttonName, parent)
+	button:SetSize(size, size)
+	button:SetPoint("LEFT", parent, "LEFT", xOffset, 0)
+	--button:SetMovable(true)
+	button:EnableMouse(true)
+	button:RegisterForDrag("LeftButton")
+	button:SetScript("OnDragStart", function(self) self:GetParent():StartMoving() end)
+	button:SetScript("OnDragStop", function(self) self:GetParent():StopMovingOrSizing() end)
+	button:SetAlpha(INACTIVE_ALPHA)
+	button.spellID = spellID
+	--button.duration = duration
+
+	button.icon = button:CreateTexture(nil, "ARTWORK")
+	button.icon:SetSize(size-4, size-4)
+	button.icon:SetPoint("CENTER", button, "CENTER", 0, 0)
+	button.icon:SetTexture(GetSpellTexture(spellID))
+
+	-- Cooldown Text (optional, for displaying remaining time)
+	button.cooldownText = button:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
+	button.cooldownText:SetPoint("CENTER", button, "CENTER", 0, 0)
+	button.cooldownText:SetJustifyH("CENTER")
+	button.cooldownText:SetTextColor(0, 1, 0, 1)
+	button.cooldownText:SetText("") -- Initially empty
+
+	button.stackText = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	button.stackText:SetPoint("BOTTOM", button, "BOTTOM", 0, 0)
+	button.stackText:SetJustifyH("CENTER")
+	button.stackText:SetTextColor(1, 1, 1, 1)
+	button.stackText:SetText("")
+
+	button:SetScript("OnUpdate", OnUpdate)
+	button:SetScript("OnEvent", OnEvent)
+
+	button:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+
+	button:Show()
+
+	return button
+end
+
+buffFrame:SetScript("OnEvent", function(self, event, ...)
+	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+		local _, subEvent, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellID, spellName = ...
+
+		if srcGUID == UnitGUID("player") then
+			if subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH" or subEvent == "SPELL_AURA_APPLIED_DOSE" then
+				--if tContains(spells, spellName) then
+					print(spellName, spellID)
+				--end
+			end
+			
+			if subEvent:sub(1, 5) == "SPELL" then
+				print(subEvent)
+			end
+		end
+	end
+end)
+
+if UnitClass("player") == "Druid" then
+	--print("Loaded DruidBuffs")
+	--buffFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+
+	for k, spell in pairs(spells) do
+		CreateBuffButton(buffFrame, 48, (k*48)-48, spell) 
+	end
 
 	buffFrame:Show()
 else
