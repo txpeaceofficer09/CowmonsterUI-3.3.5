@@ -1,22 +1,41 @@
 -- Create a new frame to hold the buttons
-local buffFrame = CreateFrame("Frame", "HunterPetBuffFrame", UIParent)
+local buffFrame = CreateFrame("Frame", "DruidBuffFrame", UIParent)
 buffFrame:SetSize(64, 32) -- Adjust size as needed
 buffFrame:SetPoint("CENTER", UIParent, "CENTER", 0, -100) -- Adjust position as needed
 buffFrame:SetMovable(true)
 
--- Spell IDs (might need verification on your specific server)
-local MEND_PET_SPELL_ID = 27046 -- Mend Pet
-local FEED_PET_SPELL_ID = 1539 -- Feed Pet
+local spells = {
+	--"Barkskin", -- 22812
+	--"Mangle (Cat)", -- 33983
+	--"Mangle (Bear)", -- 33987
+	--"Bash", -- 8983
+	--"Rake", -- 48573
+	--"Rip", -- 49799
+	"Maim",
+	--"Faerie Fire (Feral)", -- 16857
+	"Faerie Fire",
+	"Nature's Grasp",
+	"Entangling Roots",
+	"Cyclone",
+	--"Lacerate", -- 48567
+	"Berserk",
+	"Demoralizing Roar",
+	"Challenging Roar",
+	--"Growl", -- 6795
+	"Enrage",
+	"Tiger's Fury",
+	"Pounce",
+	"Innervate" -- Make an addon to whisper people when you cast a buff and when it fades.
+}
 
 local ACTIVE_ALPHA = 1
 local INACTIVE_ALPHA = 0.25
 
-local MEND_PET_DURATION = 15
-local FEED_PET_DURATION = 20
-
 -- Function to create a buff button
 local function CreateBuffButton(parent, name, size, xOffset, spellID, duration)
 	local texture = select(2, GetSpellInfo(spellID))
+
+	texture = string.gsub(texture, "\\", "\\\\");
 
 	local button = CreateFrame("Frame", name, parent)
 	button:SetSize(size, size)
@@ -45,11 +64,28 @@ local function CreateBuffButton(parent, name, size, xOffset, spellID, duration)
 	button:SetScript("OnUpdate", OnUpdate)
 	button:SetScript("OnEvent", OnEvent)
 
+	button:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+
+	print("Created "..name)
+
+	button:Show()
+
 	return button
 end
 
-local mendPetButton = CreateBuffButton(buffFrame, "MendPetButton", 64, 0, 27046, 15)
-local feedPetButton = CreateBuffButton(buffFrame, "FeedPetButton", 64, 64, 1539, 20)
+buffFrame:SetScript("OnEvent", function(self, event, ...)
+	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
+		local _, subEvent, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellID, spellName = ...
+
+		if srcGUID == UnitGUID("player") then
+			if subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH" then
+				if tContains(spells, spellName) then
+					print(spellName, spellID)
+				end
+			end
+		end
+	end
+end)
 
 local function OnEvent(self, event, ...)
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
@@ -86,8 +122,12 @@ local function OnUpdate(self, elapsed)
 end
 
 if UnitClass("player") == "Druid" then
-    buffFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-    buffFrame:Show()
+	print("Loaded DruidBuffs")
+	buffFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+
+	CreateBuffButton(buffFrame, "BarkskinButton", 64, 0, 22812, 12)
+
+	buffFrame:Show()
 else
     buffFrame:Hide()
 end

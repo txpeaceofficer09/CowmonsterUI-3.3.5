@@ -1,0 +1,6 @@
+## Interface: 30300
+## Title: CowmonsterUI_AddOnMessages
+## Version: 1.0.0
+## Author: SoonBeSteak @ Netherwing
+## Notes: AddOn message handler.
+Core.lua

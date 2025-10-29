@@ -224,6 +224,16 @@ local function PrependTimestamp(self, event, message, sender, ...)
 end
 ]]
 
+local function GetNumGroupMembers()
+	if GetNumRaidMembers() > 0 then
+		return GetNumRaidMembers()
+	elseif GetNumPartyMembers() > 0 then
+		return GetNumPartyMembers()
+	else
+		return 0
+	end
+end
+
 local function AddPlayerData(name, rank, level, class, note)
 	--if not SteakChatPlayerData[name] then SteakChatPlayerData[name] = {} end
 	SteakChatPlayerData[name] = SteakChatPlayerData[name] or {}
@@ -299,7 +309,11 @@ local function GetPlayerLink(playerName, lineID)
 	if name == playerName then
 		--print(name, rank, level, class, note)
 		AddPlayerData(playerName, rank, level, class, note or "")
-		return ("|cff%02x%02x%02x|Hplayer:%s:%s|h%s|h|r"):format((RAID_CLASS_COLORS[strupper(class)].r * 255), (RAID_CLASS_COLORS[strupper(class)].g * 255), (RAID_CLASS_COLORS[strupper(class)].b * 255), playerName, lineID, playerName)
+		if RAID_CLASS_COLORS[strupper(class)] then
+			return ("|cff%02x%02x%02x|Hplayer:%s:%s|h%s|h|r"):format((RAID_CLASS_COLORS[strupper(class)].r * 255), (RAID_CLASS_COLORS[strupper(class)].g * 255), (RAID_CLASS_COLORS[strupper(class)].b * 255), playerName, lineID, playerName)
+		else
+			return ("|cff%02x%02x%02x|Hplayer:%s:%s|h%s|h|r"):format((1 * 255), (1 * 255), (1 * 255), playerName, lineID, playerName)
+		end
 	elseif GetNumGroupMembers() > 0 then
 		for i=1,GetNumGroupMembers(),1 do
 			if UnitExists("raid"..i) and UnitName("raid"..i) == playerName then
