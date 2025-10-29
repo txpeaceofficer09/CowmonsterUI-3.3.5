@@ -16,7 +16,6 @@ end
 local function SendAddOnMessage()
 	if GetChannelName(f.channel) > 0 then
 		SendChatMessage(f.messages[1], "CHANNEL", nil, GetChannelName(f.channel))
-		table.remove(f.messages, 1)
 	end
 end
 
@@ -36,7 +35,7 @@ local function OnEvent(self, event, ...)
 			if name == UnitName("player") then
 				for a,b in ipairs(self.messages) do
 					if msg == b then
-						table.remove(self.messages, 1)
+						table.remove(self.messages, a)
 					end
 				end
 			end
