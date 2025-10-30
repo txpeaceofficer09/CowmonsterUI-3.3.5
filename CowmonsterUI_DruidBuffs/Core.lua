@@ -1,85 +1,97 @@
--- Create a new frame to hold the buttons
-local buffFrame = CreateFrame("Frame", "DruidBuffFrame", UIParent)
-buffFrame:SetSize(64, 32) -- Adjust size as needed
-buffFrame:SetPoint("CENTER", UIParent, "CENTER", 0, -100) -- Adjust position as needed
-buffFrame:SetMovable(true)
-
 local spells = {
-	53307, -- Thorns
+	--53307, -- Thorns
+	29166, --"Innervate" -- Make an addon to whisper people when you cast a buff and when it fades.
+	69369, -- Predator's Swiftness
+	62606, -- Savage Defense
 	22812, -- Barkskin
+	50334, -- Berserker
+	61336, -- Survival Instincts
+	22842, -- Frenzied Regeneration
+	50212, -- Tiger's Fury
+	52610, -- Savage Roar
+	5229, -- Enrage
 	--33983, -- Mangle (Cat)
 	--33987, -- Mangle (Bear)
 	8983, -- Bash
 	48573, -- Rake
 	49799, -- Rip
+	33786, -- Cyclone
+	26989, -- Entangling Roots
+	27009, -- Nature's Grasp (Buff)
+	27010, -- Nature's Grasp (Debuff)
+	18658, -- Hibernate
+	26995, -- Soothe Animal
 	--"Maim",
-	16857, -- Faerie Fire (Feral)
-	770, --"Faerie Fire",
-	--"Nature's Grasp",
-	--"Entangling Roots",
-	--"Cyclone",
+	--16857, -- Faerie Fire (Feral)
+	--770, --"Faerie Fire",
 	--48567, -- Lacerate
-	--"Berserk",
 	--"Demoralizing Roar",
 	--"Challenging Roar",
 	--6795, -- Growl
-	--"Enrage",
-	--"Tiger's Fury",
-	--"Pounce",
-	2893, -- Abolish Poison
-	29166, --"Innervate" -- Make an addon to whisper people when you cast a buff and when it fades.
-	69369, -- Predator's Swiftness
-	48450, -- Lifebloom
-	48440, -- Rejuvenation
-	48442, -- Regrowth
+	--49803, -- Pounce
+	--2893, -- Abolish Poison
+	--48450, -- Lifebloom
+	--48440, -- Rejuvenation
+	--48442, -- Regrowth
+	--16870, -- Clearcastings
 }
 
 local ACTIVE_ALPHA = 1
 local INACTIVE_ALPHA = 0.25
+local BUTTON_SIZE = 32
+
+-- Create a new frame to hold the buttons
+local buffFrame = CreateFrame("Frame", "DruidBuffFrame", UIParent)
+buffFrame:SetSize((#spells * BUTTON_SIZE), BUTTON_SIZE) -- Adjust size as needed
+buffFrame:SetPoint("CENTER", UIParent, "CENTER", 0, -100) -- Adjust position as needed
+buffFrame:SetMovable(true)
+
+local events = {
+	"SPELL_AURA_APPLIED",
+	"SPELL_AURA_APPLIED_DOSE",
+	"SPELL_CAST_SUCCESS",
+	"SPELL_PERIODIC_HEAL",
+	"SPELL_AURA_REMOVED",
+	"SPELL_HEAL",
+	"SPELL_ENERGIZE",
+	"SPELL_CAST_START",
+	"SPELL_AURA_REMOVED",
+	"SPELL_PERIODIC_ENERGIZE",
+	"SPELL_PERIODIC_DAMAGE",
+	"SPELL_DAMAGE",
+	"SPELL_CAST_FAILED",
+	"SPELL_AURA_REFRESH",
+	"SPELL_MISSED",
+}
+
+local units = {
+	"player",
+	"playerpet",
+	"target",
+	"targetpet",
+	"focus",
+	"focustarget",
+	"focuspet",
+}
+
+for i=1,40,1 do
+	if i <= 5 then
+		tinsert(units, "party"..i)
+		tinsert(units, "party"..i.."target")
+		tinsert(units, "party"..i.."pet")
+	end
+	
+	tinsert(units, "raid"..i)
+	tinsert(units, "raid"..i.."target")
+	tinsert(units, "raid"..i.."pet")
+end
+
 
 local function GetUnitByGUID(guid)
-	if UnitGUID("player") == guid then
-		return "player"
-	end
-
-	if UnitGUID("playerpet") == guid then
-		return "playerpet"
-	end
-	
-	if UnitGUID("target") == guid then
-		return "target"
-	end
-	
-	if UnitGUID("targetpet") == guid then
-		return "targetpet"
-	end
-	
-	if UnitGUID("focus") == guid then
-		return "focus"
-	end
-
-	if UnitGUID("focustarget") == guid then
-		return "focustarget"
-	end
-	
-	if UnitGUID("focuspet") == guid then
-		return "focuspet"
-	end
-
-	for i=1,40,1 do
-		if UnitGUID("party"..i) and UnitGUID("party"..i) == guid then
-			return "party"..i
-		elseif UnitGUID("party"..i.."target") and UnitGUID("party"..i.."target") == guid then
-			return "party"..i.."target"
-		elseif UnitGUID("party"..i.."pet") and UnitGUID("party"..i.."pet") == guid then
-			return "party"..i.."pet"
-		elseif UnitGUID("raid"..i) and UnitGUID("raid"..i) == guid then
-			return "raid"..i
-		elseif UnitGUID("raid"..i.."target") and UnitGUID("raid"..i.."target") == guid then
-			return "raid"..i.."target"
-		elseif UnitGUID("raid"..i.."pet") and UnitGUID("raid"..i.."pet") == guid then
-			return "raid"..i.."pet"
-		end		
+	for _, unit in ipairs(units) do
+		if UnitGUID(unit) and UnitGUID(unit) == guid then
+			return unit
+		end
 	end
 	
 	return nil
@@ -108,20 +120,15 @@ end
 local function GetSpellTexture(spellID)
 	local _, _, texture = GetSpellInfo(spellID)
 	
-	--return texture:gsub("\\", "\\\\")
 	return texture
 end
 
 local function OnEvent(self, event, ...)
-	--self.icon:SetTexture(GetSpellTexture(self.spellID))
-
-	--print(event, ...)
-
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		local _, subEvent, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellID, spellName = ...
+		local timeStamp, subEvent, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellID, spellName = ...
 
 		if srcGUID == UnitGUID("player") then
-			if subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_APPLIED_DOSE" or subEvent == "SPELL_AURA_REFRESH" then
+			if subEvent == "SPELL_CAST_SUCCESS" or subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_APPLIED_DOSE" or subEvent == "SPELL_AURA_REFRESH" then
 				if spellID == self.spellID then
 					local unit = GetUnitByGUID(dstGUID)
 
@@ -130,12 +137,13 @@ local function OnEvent(self, event, ...)
 					
 					if unit ~= nil then
 						local duration, endTime, stacks = GetAuraInfo(unit, spellID)
-						--print(unit, duration, endTime)
+
 						if endTime ~= nil then
 							self.endTime = self.startTime + endTime
 						elseif duration ~= nil then
 							self.endTime = self.startTime + duration
 						end
+
 						if ( stacks or 0 ) > 0 then
 							self.stackText:SetText(stacks)
 						else
@@ -149,6 +157,9 @@ local function OnEvent(self, event, ...)
 				self:SetAlpha(INACTIVE_ALPHA)
 				self.startTime = nil
 				self.endTime = nil
+				
+				self.cooldownText:SetText("")
+				self.stackText:SetText("")
 			end
 		end
 	end
@@ -160,13 +171,10 @@ local function OnUpdate(self, elapsed)
 	if ( self.timer >= 0.2 ) then
 		if self.startTime ~= nil and self.endTime ~= nil then
 			local duration = self.endTime - GetTime()
-			--local stacks = select(4, GetSpellInfo(self.spellID))
 
 			self.cooldownText:SetText(("%.1f"):format(duration))
-			--self.stackText:SetText(stacks)
 		else
-			self.cooldownText:SetText("")
-			self.stackText:SetText("")
+			--self.cooldownText:SetText("")
 		end
 	end
 end
@@ -222,15 +230,17 @@ buffFrame:SetScript("OnEvent", function(self, event, ...)
 		local _, subEvent, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellID, spellName = ...
 
 		if srcGUID == UnitGUID("player") then
-			if subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH" or subEvent == "SPELL_AURA_APPLIED_DOSE" then
+			if subEvent == "SPELL_CAST_SUCCESS" or subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_REFRESH" or subEvent == "SPELL_AURA_APPLIED_DOSE" then
 				--if tContains(spells, spellName) then
 					print(spellName, spellID)
 				--end
 			end
 			
+			
 			if subEvent:sub(1, 5) == "SPELL" then
 				print(subEvent)
 			end
+			
 		end
 	end
 end)
@@ -240,7 +250,7 @@ if UnitClass("player") == "Druid" then
 	--buffFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
 	for k, spell in pairs(spells) do
-		CreateBuffButton(buffFrame, 48, (k*48)-48, spell) 
+		CreateBuffButton(buffFrame, BUTTON_SIZE, (k*BUTTON_SIZE)-BUTTON_SIZE, spell) 
 	end
 
 	buffFrame:Show()
