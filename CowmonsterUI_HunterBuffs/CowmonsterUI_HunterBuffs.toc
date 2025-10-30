@@ -1,0 +1,5 @@
+## Interface: 30300
+## Author: SoonBeSteak
+## Title: CowmonsterUI_HunterBuffs
+## Notes: Keep track of hunter buffs and debuffs.
+Core.lua
