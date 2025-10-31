@@ -135,16 +135,6 @@ local function ShareXP_Refresh()
 	end
 end
 
-local function QueueAddOnMessage(msg)
-	for _, existingMsg in ipairs(ShareXPFrame.messages) do
-		if existingMsg == msg then
-			return
-		end
-	end
-
-	table.insert(ShareXPFrame.messages, msg)
-end
-
 local function ShareXP(lvl)
 	if lvl ~= nil then
 		QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), lvl))
@@ -205,12 +195,7 @@ end
 
 local f = CreateFrame("frame", "ShareXPFrame", UIParent)
 
-f.messages = {}
-
-f.lastMessageTime = GetTime() - delay
-
-f:SetWidth(barWidth)
-f:SetHeight(barSize)
+f:SetSize(barWidth, barSize)
 
 f:SetClampedToScreen(true)
 f:SetMovable(true)
@@ -235,7 +220,8 @@ f.background:SetTexture("Interface\\BUTTONS\\GRADBLUE")
 f.background:SetVertexColor(1, 0.5, 0.5, 1)
 
 local title = f:CreateFontString(f:GetName().."Text", "OVERLAY")
-title:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE")
+--title:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE")
+title:SetFont("Interface\\AddOns\\CowmonsterUI\\Fonts\\Iceberg-Regular.ttf", 12, "OUTLINE")
 title:SetAllPoints(f)
 title:SetJustifyH("LEFT")
 title:SetText("ShareXP")
@@ -363,15 +349,6 @@ local function OnEvent(self, event, ...)
 			ShareXPFrame:Show()
 		end
 	end
-
-	if event:sub(1, 9) == "CHAT_MSG_" then
-		local name = select(2, ...)
-
-		if name == UnitName("player") then
-			self.lastMessageTime = GetTime()
-			self.counter = (self.counter or 0) + 1
-		end
-	end
 end
 
 f:RegisterEvent("CHAT_MSG_GUILD")
@@ -391,31 +368,7 @@ f:RegisterEvent("PLAYER_LEVEL_UP")
 f:RegisterEvent("RAID_ROSTER_UPDATE")
 --f:RegisterEvent("PARTY_MEMBERS_CHANGED")
 
-local function OnUpdate(self, elapsed)
-	self.timer = (self.timer or 0) + elapsed
-	self.timer2 = (self.timer2 or 0) + elapsed
-	self.lastMessageTime = self.lastMessageTime or GetTime()
-
-	if self.timer > 0.2 then
-		if GetTime() - self.lastMessageTime > delay and (self.counter or 0) < 3 then
-			if #(self.messages) > 0 then
-				SendAddOnMessage()
-			end
-		end
-
-		self.timer = 0
-	end
-
-	if self.timer2 >= 5 then
-		if (self.counter or 0) > 0 then
-			self.counter = self.counter - 1
-		end
-		self.timer2 = 0
-	end
-end
-
 f:SetScript("OnEvent", OnEvent)
-f:SetScript("OnUpdate", OnUpdate)
 
 local function SlashCmd(...)
 	local cmd, params = string.split(" ", string.lower(...), 2)

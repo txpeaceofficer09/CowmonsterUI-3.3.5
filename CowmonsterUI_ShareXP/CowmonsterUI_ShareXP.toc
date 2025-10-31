@@ -4,4 +4,5 @@
 ## Author: SoonBeSteak @ Netherwing
 ## Notes: Share your current XP level with your group.
 ## SavedVariables: ShareXPDB
+## Dependencies: CowmonsterUI, CowmonsterUI_AddOnMessages
 Core.lua
