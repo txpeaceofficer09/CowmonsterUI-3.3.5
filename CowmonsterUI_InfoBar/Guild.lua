@@ -1,6 +1,8 @@
 local GuildMembersDB = {}
 local onlineGuildMembers = 0
 
+local FONT_SIZE = 12
+
 local f = CreateFrame("Frame", "InfoBarGuildList", InfoBarFrame)
 f.columns = 8 -- name, race, class, rank, level, zone, note, officer note
 --f:SetFrameLevel(99)
@@ -20,7 +22,7 @@ local function CreateBar(index)
 		bar:SetPoint("TOPRIGHT", _G["InfoBarGuildListBar"..(index-1)], "BOTTOMRIGHT", 0, -2)
 	end
 
-	bar:SetHeight(16)
+	bar:SetHeight(FONT_SIZE)
 	bar:SetMinMaxValues(0,70)
 	bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 	--bar:GetStatusBarTexture():SetHorizTile(false)
@@ -32,7 +34,7 @@ local function CreateBar(index)
 		--ctl:SetFont("Fonts\\ARIALN.ttf", FontSize, "OUTLINE")
 		--local t = bar:CreateFontString(("InfoBarGuildListBar%sText%s"):format(index, i), "OVERLAY", "NumberFont_Outline_Med")
 		local t = bar:CreateFontString(("InfoBarGuildListBar%sText%s"):format(index, i), "OVERLAY")
-		t:SetFont("Fonts\\ARIALN.ttf", 16, "OUTLINE")
+		t:SetFont("Fonts\\ARIALN.ttf", FONT_SIZE, "OUTLINE")
 		if i == 1 then
 			t:SetPoint("LEFT", bar, "LEFT", 2, 0)
 		else
@@ -68,7 +70,7 @@ end
 
 local function ResizeList()
 	local width = 0
-	InfoBarGuildList:SetHeight((onlineGuildMembers*18)+18)
+	InfoBarGuildList:SetHeight((onlineGuildMembers*(FONT_SIZE+2))+(FONT_SIZE+2))
 
 	for i=1,InfoBarGuildList.columns,1 do
 		width = width + _G[("InfoBarGuildListBar1Text%s"):format(i)]:GetWidth() + 2
@@ -105,8 +107,10 @@ function InfoBarGuild_Refresh()
 
 			bar:SetValue(v.level)
 
-			if RAID_CLASS_COLORS[strupper(v.class)] then
-				bar:SetStatusBarColor(RAID_CLASS_COLORS[strupper(v.class)].r, RAID_CLASS_COLORS[strupper(v.class)].g, RAID_CLASS_COLORS[strupper(v.class)].b, 1)
+			local class = strupper(v.class:gsub(" ", ""))
+
+			if RAID_CLASS_COLORS[class] then
+				bar:SetStatusBarColor(RAID_CLASS_COLORS[class].r, RAID_CLASS_COLORS[class].g, RAID_CLASS_COLORS[class].b, 1)
 			end
 
 			bar:Show()
