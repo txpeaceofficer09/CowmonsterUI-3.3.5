@@ -22,9 +22,9 @@ local spells = {
 	18658, -- Hibernate
 	26995, -- Soothe Animal
 	--"Maim",
-	--16857, -- Faerie Fire (Feral)
-	--770, --"Faerie Fire",
-	--48567, -- Lacerate
+	16857, -- Faerie Fire (Feral)
+	770, --"Faerie Fire",
+	48567, -- Lacerate
 	--"Demoralizing Roar",
 	--"Challenging Roar",
 	--6795, -- Growl
@@ -125,11 +125,12 @@ end
 
 local function OnEvent(self, event, ...)
 	if event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		local timeStamp, subEvent, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellID, spellName = ...
+		local _, subEvent, srcGUID, srcName, srcFlags, dstGUID, dstName, dstFlags, spellID, spellName = ...
 
 		if srcGUID == UnitGUID("player") then
 			if subEvent == "SPELL_CAST_SUCCESS" or subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_APPLIED_DOSE" or subEvent == "SPELL_AURA_REFRESH" then
 				if spellID == self.spellID then
+					self.guid = dstGUID
 					local unit = GetUnitByGUID(dstGUID)
 
 					self:SetAlpha(ACTIVE_ALPHA)
@@ -153,13 +154,27 @@ local function OnEvent(self, event, ...)
 
 					--self.endTime = self.startTime + self.duration
 				end
+			elseif subEvent == "UNIT_DIED" then
+				--[[
+				if self.guid ~= nil and self.guid == dstGUID then
+					self.guid = nil
+
+					self:SetAlpha(INACTIVE_ALPHA)
+					self.startTime = nil
+					self.endTime = nil
+
+					self.remainingText:SetText("")
+					self.stackText:SetText("")
+				end]]
 			elseif subEvent == "SPELL_AURA_REMOVED" then
-				self:SetAlpha(INACTIVE_ALPHA)
-				self.startTime = nil
-				self.endTime = nil
+				if spellID == self.spellID then
+					self:SetAlpha(INACTIVE_ALPHA)
+					self.startTime = nil
+					self.endTime = nil
 				
-				self.cooldownText:SetText("")
-				self.stackText:SetText("")
+					self.remainingText:SetText("")
+					self.stackText:SetText("")
+				end
 			end
 		end
 	end
@@ -172,9 +187,13 @@ local function OnUpdate(self, elapsed)
 		if self.startTime ~= nil and self.endTime ~= nil then
 			local duration = self.endTime - GetTime()
 
-			self.cooldownText:SetText(("%.1f"):format(duration))
+			if duration > 60 then
+				self.remainingText:SetText(("%.0fm"):format(duration/60))
+			else
+				self.remainingText:SetText(("%.1f"):format(duration))
+			end
 		else
-			--self.cooldownText:SetText("")
+			--self.remainingText:SetText("")
 		end
 	end
 end
@@ -203,17 +222,23 @@ local function CreateBuffButton(parent, size, xOffset, spellID)
 	button.icon:SetTexture(GetSpellTexture(spellID))
 
 	-- Cooldown Text (optional, for displaying remaining time)
-	button.cooldownText = button:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
-	button.cooldownText:SetPoint("CENTER", button, "CENTER", 0, 0)
-	button.cooldownText:SetJustifyH("CENTER")
-	button.cooldownText:SetTextColor(0, 1, 0, 1)
-	button.cooldownText:SetText("") -- Initially empty
+	button.remainingText = button:CreateFontString(nil, "OVERLAY", "GameFontNormalHuge")
+	button.remainingText:SetPoint("CENTER", button, "CENTER", 0, 0)
+	button.remainingText:SetJustifyH("CENTER")
+	button.remainingText:SetTextColor(0, 1, 0, 1)
+	button.remainingText:SetText("") -- Initially empty
 
 	button.stackText = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	button.stackText:SetPoint("BOTTOM", button, "BOTTOM", 0, 0)
 	button.stackText:SetJustifyH("CENTER")
 	button.stackText:SetTextColor(1, 1, 1, 1)
 	button.stackText:SetText("")
+
+	button.cooldownText = button:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+	button.cooldownText:SetPoint("TOP", button, "TOP", 0, 0)
+	button.cooldownText:SetJustifyH("CENTER")
+	button.cooldownText:SetTextColor(1, 0, 0, 1)
+	button.cooldownText:SetText("")
 
 	button:SetScript("OnUpdate", OnUpdate)
 	button:SetScript("OnEvent", OnEvent)
