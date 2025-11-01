@@ -13,12 +13,13 @@ ShareXPDB = {
 
 local Settings = {
 	--["background"] = "Interface\\DialogFrame\\UI-DialogBox-BackGround-Dark",
-	["background"] = "Interface\\AddOns\\CowmonsterUI_InfoBar\\textures\\bar_serenity",
+	--["background"] = "Interface\\AddOns\\CowmonsterUI\\Textures\\bar_serenity",
+	["background"] = "Interface\\BUTTONS\\GRADBLUE",
 	["border"] = "Interface\\Tooltips\\UI-Tooltip-Border",
 	["refresh_rate"] = 2,
 }
 
-local MAX_LEVEL = 70
+local MAX_LEVEL = 80
 
 --[[
 if WOW_PROJECT_ID == 1 then
@@ -101,7 +102,11 @@ end
 
 local function ShareXP_Refresh()
 	local sortTbl = {}
-	for k,v in ipairs(ShareXPDB.data) do table.insert(sortTbl, k) end
+	for k,v in ipairs(ShareXPDB.data) do
+		if v.lvl < 80 then
+			table.insert(sortTbl, k)
+		end
+	end
 	table.sort(sortTbl, function(a,b) return ShareXPDB.data[a].percent > ShareXPDB.data[b].percent end)
 
 	local index = 1

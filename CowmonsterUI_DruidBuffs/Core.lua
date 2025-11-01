@@ -10,6 +10,7 @@ local spells = {
 	50212, -- Tiger's Fury
 	52610, -- Savage Roar
 	5229, -- Enrage
+	48567, -- Lacerate
 	--33983, -- Mangle (Cat)
 	--33987, -- Mangle (Bear)
 	8983, -- Bash
@@ -22,9 +23,8 @@ local spells = {
 	18658, -- Hibernate
 	26995, -- Soothe Animal
 	--"Maim",
-	16857, -- Faerie Fire (Feral)
-	770, --"Faerie Fire",
-	48567, -- Lacerate
+	--16857, -- Faerie Fire (Feral)
+	--770, --"Faerie Fire",
 	--"Demoralizing Roar",
 	--"Challenging Roar",
 	--6795, -- Growl
@@ -130,7 +130,6 @@ local function OnEvent(self, event, ...)
 		if srcGUID == UnitGUID("player") then
 			if subEvent == "SPELL_CAST_SUCCESS" or subEvent == "SPELL_AURA_APPLIED" or subEvent == "SPELL_AURA_APPLIED_DOSE" or subEvent == "SPELL_AURA_REFRESH" then
 				if spellID == self.spellID then
-					self.guid = dstGUID
 					local unit = GetUnitByGUID(dstGUID)
 
 					self:SetAlpha(ACTIVE_ALPHA)
@@ -154,18 +153,6 @@ local function OnEvent(self, event, ...)
 
 					--self.endTime = self.startTime + self.duration
 				end
-			elseif subEvent == "UNIT_DIED" then
-				--[[
-				if self.guid ~= nil and self.guid == dstGUID then
-					self.guid = nil
-
-					self:SetAlpha(INACTIVE_ALPHA)
-					self.startTime = nil
-					self.endTime = nil
-
-					self.remainingText:SetText("")
-					self.stackText:SetText("")
-				end]]
 			elseif subEvent == "SPELL_AURA_REMOVED" then
 				if spellID == self.spellID then
 					self:SetAlpha(INACTIVE_ALPHA)
@@ -193,7 +180,7 @@ local function OnUpdate(self, elapsed)
 				self.remainingText:SetText(("%.1f"):format(duration))
 			end
 		else
-			--self.remainingText:SetText("")
+			self.remainingText:SetText("")
 		end
 	end
 end
@@ -271,9 +258,6 @@ buffFrame:SetScript("OnEvent", function(self, event, ...)
 end)
 
 if UnitClass("player") == "Druid" then
-	--print("Loaded DruidBuffs")
-	--buffFrame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
-
 	for k, spell in pairs(spells) do
 		CreateBuffButton(buffFrame, BUTTON_SIZE, (k*BUTTON_SIZE)-BUTTON_SIZE, spell) 
 	end
