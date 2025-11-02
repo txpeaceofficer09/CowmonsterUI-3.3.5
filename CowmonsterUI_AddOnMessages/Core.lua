@@ -29,7 +29,7 @@ local function OnEvent(self, event, ...)
 	elseif ( event == "CHAT_MSG_CHANNEL" ) then
 		local msg, name, _, _, _, _, _, _, chan = ...		
 
-		if ( chan == f.channel and IsInParty(name) ) then
+		if ( chan == f.channel and CowmonsterUI.IsInParty(name) ) then
 			local type, args = string.split(":", msg, 2)
 
 			if name == UnitName("player") then

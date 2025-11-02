@@ -1,3 +1,33 @@
+function CowmonsterUI.GetNumGroupMembers()
+        local party, raid = GetNumPartyMembers(), GetNumRaidMembers()
+
+	if raid > 0 then
+		return raid
+	elseif party > 0 then
+		return party
+	else
+		return 0
+	end
+end
+
+function CowmonsterUI.IsInParty(name)
+	if ( name == UnitName("player") ) then
+		return true
+	end
+
+	if ( GetNumGroupMembers() > 0 ) then
+		for i=1,GetNumGroupMembers(),1 do
+			if ( UnitName("raid"..i) ~= nil and UnitName("raid"..i) == name ) then
+				return true
+			elseif ( UnitName("party"..i) ~= nil and UnitName("party"..i) == name ) then
+				return true
+			end
+		end
+	end
+
+	return false
+end
+
 function CowmonsterUI.EnumerateFrameChildren(frame)
   if not frame then
     print("Error: Frame is nil.")

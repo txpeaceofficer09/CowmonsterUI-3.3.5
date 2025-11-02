@@ -21,19 +21,18 @@ local Settings = {
 
 local MAX_LEVEL = 80
 
---[[
-if WOW_PROJECT_ID == 1 then
-	MAX_LEVEL = 60
-elseif WOW_PROJECT_ID == 2 then
-	MAX_LEVEL = 70
-elseif WOW_PROJECT_ID == 3 then
-	MAX_LEVEL = 80
-elseif WOW_PROJECT_ID == 4 then
-	MAX_LEVEL = 85
-elseif WOW_PROJECT_ID == 5 then
-	MAX_LEVEL = 90
+local function GetNumGroupMembers()
+	local party = GetNumPartyMembers()
+	 GetNumRaidMembers()
+
+	if GetNumRaidMembers() > 0 then
+		return GetNumRaidMembers()
+	elseif GetNumPartyMembers() > 0 then
+		return GetNumPartyMembers()
+	else
+		return 0
+	end
 end
-]]
 
 local function ucfirst(str)
 	return string.upper(string.sub(str, 1, 1))..string.lower(string.sub(str, 2))
@@ -103,7 +102,7 @@ end
 local function ShareXP_Refresh()
 	local sortTbl = {}
 	for k,v in ipairs(ShareXPDB.data) do
-		if v.lvl < 80 then
+		if v.lvl < MAX_LEVEL then
 			table.insert(sortTbl, k)
 		end
 	end
@@ -225,8 +224,8 @@ f.background:SetTexture("Interface\\BUTTONS\\GRADBLUE")
 f.background:SetVertexColor(1, 0.5, 0.5, 1)
 
 local title = f:CreateFontString(f:GetName().."Text", "OVERLAY")
---title:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE")
-title:SetFont("Interface\\AddOns\\CowmonsterUI\\Fonts\\Iceberg-Regular.ttf", 12, "OUTLINE")
+title:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE")
+--title:SetFont("Interface\\AddOns\\CowmonsterUI\\Fonts\\Iceberg-Regular.ttf", 12, "OUTLINE")
 title:SetAllPoints(f)
 title:SetJustifyH("LEFT")
 title:SetText("ShareXP")
