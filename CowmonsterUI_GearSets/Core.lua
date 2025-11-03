@@ -4,7 +4,8 @@ local function CreateEquipmentButtons()
 	for i=1,GetNumEquipmentSets() do
 		local name, icon, setID = GetEquipmentSetInfo(i)
 
-		local f = CreateFrame("Frame", "EQ"..i.."Button", UIParent)
+		--local f = CreateFrame("Frame", "EQ"..i.."Button", UIParent)
+		local f = CreateFrame("Button", "EQ"..i.."Button", UIParent)
 
 		f:SetSize(24, 24)
 		if i == 1 then
