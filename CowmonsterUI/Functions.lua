@@ -83,13 +83,13 @@ function CowmonsterUI.ConvertMilliseconds(milliseconds)
 end
 
 function CowmonsterUI.AddComma(num)
-        local retVal = num
+        local retVal = tostring(num)
         local i
 
         while true do
-                retVal, i = string.gsub(retVal, "^(-?%d+)(%d%d%d)", '%1,%2')
+                retVal, i = string.gsub(retVal, "^(-?%d+)(%d%d%d)", "%1,%2")
 
-                if i == 0 then break end
+                if type(i) ~= 'number' or i == 0 then break end
         end
 
         return retVal
@@ -144,7 +144,7 @@ function CowmonsterUI.IsInParty(name)
 		return true
 	end
 
-	if IsInRaid() then
+	if GetNumRaidMembers() > 0 then
 		for i=1,GetNumRaidMembers(),1 do
 			if strfind((name or "???"), (UnitName("raid"..i) or "Unknown"), 1) then
 				return "raid"..i
