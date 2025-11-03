@@ -23,7 +23,7 @@ local function CreateBar(index)
 	end
 
 	bar:SetHeight(FONT_SIZE)
-	bar:SetMinMaxValues(0,70)
+	bar:SetMinMaxValues(0, 80)
 	bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
 	--bar:GetStatusBarTexture():SetHorizTile(false)
 	bar:SetStatusBarColor(0, 1, 0)
