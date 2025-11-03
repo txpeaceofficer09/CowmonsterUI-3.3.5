@@ -21,19 +21,6 @@ local Settings = {
 
 local MAX_LEVEL = 80
 
-local function GetNumGroupMembers()
-	local party = GetNumPartyMembers()
-	 GetNumRaidMembers()
-
-	if GetNumRaidMembers() > 0 then
-		return GetNumRaidMembers()
-	elseif GetNumPartyMembers() > 0 then
-		return GetNumPartyMembers()
-	else
-		return 0
-	end
-end
-
 local function ucfirst(str)
 	return string.upper(string.sub(str, 1, 1))..string.lower(string.sub(str, 2))
 end
@@ -78,8 +65,8 @@ local function IsInParty(name)
 		return true
 	end
 
-	if ( GetNumGroupMembers() > 0 ) then
-		for i=1,GetNumGroupMembers(),1 do
+	if ( CowmonsterUI.GetNumGroupMembers() > 0 ) then
+		for i=1,CowmonsterUI.GetNumGroupMembers(),1 do
 			if ( UnitName("raid"..i) ~= nil and UnitName("raid"..i) == name ) then
 				return true
 			elseif ( UnitName("party"..i) ~= nil and UnitName("party"..i) == name ) then
@@ -101,11 +88,7 @@ end
 
 local function ShareXP_Refresh()
 	local sortTbl = {}
-	for k,v in ipairs(ShareXPDB.data) do
-		if v.lvl < MAX_LEVEL then
-			table.insert(sortTbl, k)
-		end
-	end
+	for k,v in ipairs(ShareXPDB.data) do table.insert(sortTbl, k) end
 	table.sort(sortTbl, function(a,b) return ShareXPDB.data[a].percent > ShareXPDB.data[b].percent end)
 
 	local index = 1
@@ -219,9 +202,14 @@ end)
 --f:SetBackdrop( { bgFile = "Interface\\AddOns\\CowmonsterUI_InfoBar\\textures\\bar_serenity", edgeFile = nil, tile = false, tileSize = f:GetWidth(), edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
 --f:SetBackdropColor(1, 0.5, 0.5, 1)
 
+f:SetBackdrop( { bgFile = "Interface\\BUTTONS\\GRADBLUE", edgeFile = nil, tile = false, tileSize = f:GetWidth(), edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
+f:SetBackdropColor(1, 0.5, 0.5, 1)
+
+--[[
 f.background = f:CreateTexture(nil, "BACKGROUND")
-f.background:SetTexture("Interface\\BUTTONS\\GRADBLUE")
+f.background:SetTexture(Settings["background"])
 f.background:SetVertexColor(1, 0.5, 0.5, 1)
+]]
 
 local title = f:CreateFontString(f:GetName().."Text", "OVERLAY")
 title:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE")
@@ -291,33 +279,41 @@ local function OnEvent(self, event, ...)
 			self:SetMovable(true)
 		end
 
-		QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), UnitLevel("player")))
+		if UnitLevel("player") < MAX_LEVEL then
+			QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), UnitLevel("player")))
+		end
 
 		self:SetPoint(ShareXPDB.p, UIParent, ShareXPDB.p, ShareXPDB.x, ShareXPDB.y)
 	elseif ( event == "PLAYER_ENTERING_WORLD" ) then
-		if GetNumGroupMembers() == 0 then
+		if CowmonsterUI.GetNumGroupMembers() == 0 then
 			Disable()
 		else
 			Enable()
 		end
 	elseif ( event == "PLAYER_LEVEL_UP" ) then
 		local lvl = ...
-		QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), lvl))
+		if lvl < MAX_LEVEL then
+			QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), lvl))
+		end
 	elseif ( event == "PLAYER_XP_UPDATE" ) then
-		QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), UnitLevel("player")))
+		if UnitLevel("player") < MAX_LEVEL then
+			QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), UnitLevel("player")))
+		end
 	elseif ( event == "CHAT_MSG_CHANNEL" ) then
 		local msg, name, _, _, _, _, _, _, chan = ...		
 
-		if ( chan == "ShareXP" and IsInParty(name) ) then
+		if ( chan == "AddOnMessages" and IsInParty(name) ) then
 			local type, args = string.split(":", msg, 2)
 
+			--[[
 			if name == UnitName("player") then
-				for a,b in ipairs(self.messages) do
+				for a,b in ipairs(self.messages or {}) do
 					if msg == b then
 						table.remove(self.messages, 1)
 					end
 				end
 			end
+			]]
 
 			if ( type == "XP" ) then
 				local unitName, class, curXP, maxXP, lvl = string.split(":", args, 5)
@@ -331,23 +327,27 @@ local function OnEvent(self, event, ...)
 				end
 			elseif ( type == "REFRESH" ) then
 				if name ~= UnitName("player") then
-					QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), UnitLevel("player")))
+					if UnitLevel("player") < MAX_LEVEL then
+						QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), UnitLevel("player")))
+					end
 				end
 			end
 		end
 	elseif ( event == "RAID_ROSTER_UPDATE" or event == "PARTY_MEMBERS_CHANGED" ) then
-		if GetNumGroupMembers() > 0 then
+		if CowmonsterUI.GetNumGroupMembers() > 0 then
 			Disable()
-		elseif GetNumGroupMembers() > 0 then
+		elseif CowmonsterUI.GetNumGroupMembers() > 0 then
 			Enable()
 		end
 
 		ShareXP_Refresh()
-		QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), UnitLevel("player")))
+		if UnitLevel("player") < MAX_LEVEL then
+			QueueAddOnMessage(("XP:%s:%s:%s:%s:%s"):format(UnitName("player"), UnitClass("player"), UnitXP("player"), UnitXPMax("player"), UnitLevel("player")))
+		end
 
 		PruneTable()
 
-		if ( GetNumGroupMembers() == 0 ) then
+		if ( CowmonsterUI.GetNumGroupMembers() == 0 ) then
 			ShareXPFrame:Hide()
 		else
 			ShareXPFrame:Show()
@@ -383,6 +383,9 @@ local function SlashCmd(...)
 	elseif cmd == "on" then
                 f:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
                 print("on")
+	elseif cmd == "reset" then
+		ShareXPDB.data = {}
+		ShareXP_Refresh()
 	end
 end
 
