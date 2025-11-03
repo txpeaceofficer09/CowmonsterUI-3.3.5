@@ -81,7 +81,8 @@ f:SetSize(barWidth, barSize)
 
 f:SetPoint(RaidCC_Config.p, UIParent, RaidCC_Config.p, RaidCC_Config.x, RaidCC_Config.y)
 
-f:SetBackdrop( { bgFile = "Interface\\BUTTONS\\GRADBLUE", edgeFile = nil, tile = false, tileSize = f:GetWidth(), edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
+--f:SetBackdrop( { bgFile = "Interface\\BUTTONS\\GRADBLUE", edgeFile = nil, tile = false, tileSize = f:GetWidth(), edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
+f:SetBackdrop( { bgFile = "Interface\\TargetingFrame\\UI-StatusBar", edgeFile = nil, tile = false, tileSize = f:GetWidth(), edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
 f:SetBackdropColor(1, 0.5, 0.5, 1)
 
 local t = f:CreateFontString(f:GetName().."Title", "OVERLAY", "NumberFont_Outline_Med")
@@ -141,18 +142,20 @@ end
 local function GetAuraInfo(unit, spellID)
         local spellName = GetSpellInfo(spellID)
 
-        for i=1,40,1 do
-                local name, _, _, stacks, _, duration, expirationTime = UnitBuff(unit, i)
-                if name ~= spellName then
-                        name, _, _, stacks, _, duration, expirationTime = UnitDebuff(unit, i)
-                end
+	if unit ~= nil and spellID ~= nil then
+	        for i=1,40,1 do
+        	        local name, _, _, stacks, _, duration, expirationTime = UnitBuff(unit, i)
+                	if name ~= spellName then
+                        	name, _, _, stacks, _, duration, expirationTime = UnitDebuff(unit, i)
+	                end
 
-                if name == spellName then
-                        if duration and expirationTime then
-                                local remaining = expirationTime - GetTime();
-                                return duration, remaining, stacks
-                        end
-                end
+        	        if name == spellName then
+                	        if duration and expirationTime then
+                        	        local remaining = expirationTime - GetTime();
+                                	return duration, remaining, stacks
+	                        end
+        	        end
+		end
         end
 
         return nil, nil, nil
@@ -195,8 +198,7 @@ end
 local function CreateBar(i)
 	local bar = _G["RaidCCBar"..i] or CreateFrame("Frame", "RaidCCBar"..i, UIParent)
 
-	bar:SetWidth(barWidth)
-	bar:SetHeight(barSize)
+	bar:SetSize(barWidth, barSize)
 
 	if i == 1 then
 		bar:SetPoint("TOP", f, "BOTTOM", 0, -2)
@@ -206,8 +208,11 @@ local function CreateBar(i)
 
 	local txt = bar:CreateTexture(bar:GetName().."RaidIcon")
 	txt:SetPoint("TOPLEFT", bar, "TOPLEFT", 0, 0)
-	txt:SetHeight(barSize)
-	txt:SetWidth(barSize)
+	txt:SetSize(barSize, barSize)
+
+	local icon = bar:CreateTexture(bar:GetName().."SpellIcon")
+	icon:SetPoint("TOPLEFT", bar, "TOPLEFT", barSize, 0)
+	icon:SetSize(barSize, barSize)
 
 	local sb = CreateFrame("StatusBar", bar:GetName().."Status", bar)
         sb:SetMinMaxValues(0, 100)
@@ -217,7 +222,7 @@ local function CreateBar(i)
         sb:SetValue(0)
         sb:SetHeight(barSize)
 
-        sb:SetPoint("TOPLEFT", bar, "TOPLEFT", barSize, 0)
+        sb:SetPoint("TOPLEFT", bar, "TOPLEFT", barSize*2, 0)
         sb:SetPoint("BOTTOMRIGHT", bar, "BOTTOMRIGHT", 0, 0)
 
         local t = sb:CreateFontString(bar:GetName().."Name", "OVERLAY", "NumberFont_Outline_Med")
@@ -324,6 +329,7 @@ local function OnUpdate(self, elapsed)
 					_G[bar:GetName().."Status"]:SetMinMaxValues(0, duration)
 					_G[bar:GetName().."Status"]:SetValue(b.endTime - GetTime())
 					_G[bar:GetName().."RaidIcon"]:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_"..(targets[k] or 0))
+					_G[bar:GetName().."SpellIcon"]:SetTexture(GetSpellTexture(a))
 
 					if remain / duration > 0.7 then
 					        _G[bar:GetName().."Status"]:SetStatusBarColor(0, 1, 0)
