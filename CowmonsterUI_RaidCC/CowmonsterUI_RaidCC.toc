@@ -1,0 +1,8 @@
+## Interface: 30300
+## Title: CowmonsterUI_RaidCC
+## Notes: A tracker for raid crowd control.
+## Author: Velcrogloves
+## Version: 1.0.0
+## SavedVariablesPerChar: RaidCC_Config
+## Dependencies: CowmonsterUI
+Core.lua
