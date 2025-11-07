@@ -277,7 +277,7 @@ local function OnEvent(self, event, ...)
 				local unit = GetUnitByGUID(dstGUID)
 				local duration, remaining = GetAuraInfo(unit, spellID)
 
-				if tContains(spells, spellID) then
+				if tContains(spells, spellID) and duration ~= nil and remaining ~= nil then
 					cc[dstGUID] = cc[dstGUID] or {}
 					cc[dstGUID][spellID] = cc[dstGUID][spellID] or {}
 					cc[dstGUID][spellID].casterName = srcName
@@ -320,28 +320,30 @@ local function OnUpdate(self, elapsed)
 				local duration = b.duration
 				local remain = b.endTime - GetTime()
 
-				if remain < 0 then
-					cc[k][a] = nil
-				else
-					local bar = CreateBar(i)
-					_G[bar:GetName().."Name"]:SetText(b.casterName)
-					_G[bar:GetName().."TimeLeft"]:SetText(("%.1fs"):format(remain))
-					_G[bar:GetName().."Status"]:SetMinMaxValues(0, duration)
-					_G[bar:GetName().."Status"]:SetValue(b.endTime - GetTime())
-					_G[bar:GetName().."RaidIcon"]:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_"..(targets[k] or 0))
-					_G[bar:GetName().."SpellIcon"]:SetTexture(GetSpellTexture(a))
+				local bar = CreateBar(i)
+				_G[bar:GetName().."Name"]:SetText(b.casterName)
+				_G[bar:GetName().."TimeLeft"]:SetText(("%.1fs"):format(remain))
+				_G[bar:GetName().."Status"]:SetMinMaxValues(0, duration)
+				_G[bar:GetName().."Status"]:SetValue(b.endTime - GetTime())
+				_G[bar:GetName().."RaidIcon"]:SetTexture("Interface\\TargetingFrame\\UI-RaidTargetingIcon_"..(targets[k] or 0))
+				_G[bar:GetName().."SpellIcon"]:SetTexture(GetSpellTexture(a))
 
-					if remain / duration > 0.7 then
-					        _G[bar:GetName().."Status"]:SetStatusBarColor(0, 1, 0)
-					elseif remain / duration > 0.4 then
-					        _G[bar:GetName().."Status"]:SetStatusBarColor(1, 1, 0)
-					elseif remain / duration > 0.2 then
-					        _G[bar:GetName().."Status"]:SetStatusBarColor(1, 0.5, 0)
-					else
-					        _G[bar:GetName().."Status"]:SetStatusBarColor(1, 0, 0)
-					end
+				if remain / duration > 0.7 then
+				        _G[bar:GetName().."Status"]:SetStatusBarColor(0, 1, 0)
+				elseif remain / duration > 0.4 then
+				        _G[bar:GetName().."Status"]:SetStatusBarColor(1, 1, 0)
+				elseif remain / duration > 0.2 then
+				        _G[bar:GetName().."Status"]:SetStatusBarColor(1, 0.5, 0)
+				else
+				        _G[bar:GetName().."Status"]:SetStatusBarColor(1, 0, 0)
+				end
+
+				if remain > 0 then
 					bar:Show()
 					i = i + 1
+				else
+					cc[k][a] = nil
+					bar:Hide()
 				end
 			end
 		end
