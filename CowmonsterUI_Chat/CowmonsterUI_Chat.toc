@@ -3,4 +3,5 @@
 ## Notes: Configures the chat frame.
 ## Author: SoonBeSteak @ Netherwing
 ## Version: 1.0.2
+## Dependencies: CowmonsterUI
 Core.lua

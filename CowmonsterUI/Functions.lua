@@ -1,3 +1,18 @@
+function CowmonsterUI.Round(x)
+	if(x - floor(x) > 0.5) then x = x + 0.5 end
+	return floor(x)
+end
+
+function CowmonsterUI.GetClassColor(class)
+	class = strupper(class:gsub(" ", ""))
+
+	if RAID_CLASS_COLORS[class] ~= nil then
+		return RAID_CLASS_COLORS[class].r or 1, RAID_CLASS_COLORS[class].g or 1, RAID_CLASS_COLORS[class].b or 1, RAID_CLASS_COLORS[class].a or 1
+	else
+		return 1, 0, 1, 1
+	end
+end
+
 function CowmonsterUI.GetNumGroupMembers()
         local party, raid = GetNumPartyMembers(), GetNumRaidMembers()
 

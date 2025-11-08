@@ -180,6 +180,18 @@ local InfoBarStrings = {
 	},
 	]]
 	{
+		["Name"] = "InfoBarSpeed",
+		["JustifyH"] = "LEFT",
+		["Scripts"] = {
+			["OnUpdate"] = "InfoBarSpeed_OnUpdate",
+			["OnEvent"] = "InfoBarSpeed_OnEvent",
+		},
+		["Events"] = {
+			"UNIT_ENTERED_VEHICLE",
+			"UNIT_EXITED_VEHICLE",
+		},
+	},
+	{
 		["Name"] = "InfoBarLat",
 		["JustifyH"] = "RIGHT",
 		["Scripts"] = {
