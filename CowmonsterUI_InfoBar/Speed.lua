@@ -4,11 +4,12 @@ function InfoBarSpeed_OnEvent(self, event, ...)
 		if unit == "player" then
 			self.currentUnit = "vehicle"
 		end
-	end
-	if (event == "UNIT_EXITED_VEHICLE") then
+	elseif (event == "UNIT_EXITED_VEHICLE") then
 		if unit == "player" then
 			self.currentUnit = "player"
 		end
+	elseif ( event == "PLAYER_ENTERING_WORLD" ) then
+		InfoBarSetText("InfoBarSpeed", "Speed: |cffffaa00%s...|r", "initializing")
 	end
 end
 
@@ -24,8 +25,13 @@ function InfoBarSpeed_OnUpdate(self, elapsed)
 			else
 				self.currentSpeed = CowmonsterUI.Round((iSpeed/7 * 100) * math.cos(GetUnitPitch(MonkeySpeedTemp.currentUnit)))
 			end
-			InfoBarSetText("InfoBarSpeed", "Speed: |cff88ff88%d%%|r", self.currentSpeed)
-
+			if self.currentSpeed == 0 then
+				InfoBarSetText("InfoBarSpeed", "Speed: |cffcccccc%d%%|r", self.currentSpeed)
+			elseif self.currentSpeed == 100 then
+				InfoBarSetText("InfoBarSpeed", "Speed: |cff8888ff%d%%|r", self.currentSpeed)
+			else		
+				InfoBarSetText("InfoBarSpeed", "Speed: |cff88ff88%d%%|r", self.currentSpeed)
+			end
 			self.timer = 0
 		else
 			InfoBarSetText("InfoBarSpeed", "Speed: |cffcccccc%s|r", "???")

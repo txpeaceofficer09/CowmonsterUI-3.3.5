@@ -96,7 +96,8 @@ function InfoBarSpellBonus_OnUpdate(self, elapsed)
 			crit = GetSpellCritChance(7)
 		end
 
-		InfoBarSetText("InfoBarSpellBonus", "Spell Bonus: %d (%s), %.2f%% crit", bonus, bonusType, crit)
+		--InfoBarSetText("InfoBarSpellBonus", "Spell Bonus: %d (%s), %.2f%% crit", bonus, bonusType, crit)
+		InfoBarSetText("InfoBarSpellBonus", "Spell Bonus: %d, %.2f%% crit", bonus, crit)
 
 		self.timer = 0
 	end

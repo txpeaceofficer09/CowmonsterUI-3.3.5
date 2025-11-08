@@ -187,6 +187,7 @@ local InfoBarStrings = {
 			["OnEvent"] = "InfoBarSpeed_OnEvent",
 		},
 		["Events"] = {
+			"PLAYER_ENTERING_WORLD",
 			"UNIT_ENTERED_VEHICLE",
 			"UNIT_EXITED_VEHICLE",
 		},
