@@ -40,6 +40,9 @@ local function OnEvent(self, event, ...)
 		SlidingActionBarTexture0:Hide()
 		SlidingActionBarTexture1:Hide()
 
+		TutorialFrameAlertButton:SetScript("OnShow", function() TutorialFrameAlertButton:Hide() end)
+		TutorialFrameAlertButton:Hide()
+
 		--BuffFrame:Hide()
 	elseif event == "CHAT_MSG_COMBAT_FACTION_CHANGE" then
 		local currentName = GetWatchedFactionInfo()

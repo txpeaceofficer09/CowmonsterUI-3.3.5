@@ -8,130 +8,80 @@ local mobFilter = {
 
 local f = CreateFrame("Frame", "InfoBarRecordsList", InfoBarFrame)
 f.columns = 7 -- spell, normal, normTarget, normZone, critical, critTarget, critZone
---f:SetFrameLevel(99)
 f:SetFrameStrata("FULLSCREEN")
 f:SetBackdrop( { bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile = nil, tile = true, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
 
-local function count(table)
-	local count = 0
-
-	for _, _ in pairs(table) do
-		count = count + 1
-	end
-
-	return count
-end
-
-local function CreateBar(index)
-	--print(("Call: CreateBar(%s)"):format(index))
-	local bar = CreateFrame("Frame", ("InfoBarRecordsListBar%s"):format(index), InfoBarRecordsList)
-
-	InfoBarRecordsList.numRows = index
-
-	if index == 0 then
-		bar:SetPoint("TOPLEFT", InfoBarRecordsList, "TOPLEFT", 4, -4)
-		bar:SetPoint("TOPRIGHT", InfoBarRecordsList, "TOPRIGHT", -4, -4)
-	else
-		bar:SetPoint("TOPLEFT", _G["InfoBarRecordsListBar"..(index-1)], "BOTTOMLEFT", 0, -2)
-		bar:SetPoint("TOPRIGHT", _G["InfoBarRecordsListBar"..(index-1)], "BOTTOMRIGHT", 0, -2)
-	end
-
-	bar:SetHeight(16)
-	--bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
-
-	for i=1,InfoBarRecordsList.columns,1 do
-		--Add labels to the bar
-		--ctl:SetFont("Fonts\\ARIALN.ttf", FontSize, "OUTLINE")
-		--local t = bar:CreateFontString(("InfoBarRecordsListBar%sText%s"):format(index, i), "OVERLAY", "NumberFont_Outline_Med")
-		local t = bar:CreateFontString(("InfoBarRecordsListBar%sText%s"):format(index, i), "OVERLAY")
-		t:SetFont("Fonts\\ARIALN.ttf", 16, "OUTLINE")
-		if i == 1 then
-			t:SetPoint("LEFT", bar, "LEFT", 2, 0)
-		else
-			t:SetPoint("LEFT", _G[("InfoBarRecordsListBar%sText%s"):format(index, (i-1))], "RIGHT", 0, 0)
-		end
-
-		t:SetJustifyH("LEFT")
-	end
-
-	return bar
-end
-
-local function ResizeColumn(index)
-	--print(("Call: ResizeColumn(%d)"):format(index))
-	local max = 0
-
-	for i=0,count(RecordsDB[playerName][RecordsDisplay]),1 do
-		--local bar = _G[("InfoBarRecordsListBar%s"):format(i)] or CreateBar(i)
-		local label = _G[("InfoBarRecordsListBar%sText%s"):format(i, index)]
-
-		if label == nil then ChatFrame:AddMessage(("InfoBarRecordsListBar%sText%s not found."):format(i, index)) end
-
-		if label:GetStringWidth() > max then max = label:GetStringWidth() end
-		--label:SetWidth(label:GetStringWidth()+30)
-	end
-
-	for i=0,count(RecordsDB[playerName][RecordsDisplay]),1 do
-		--local bar = _G[("InfoBarRecordsListBar%s"):format(i)] or CreateBar(i)
-		local label = _G[("InfoBarRecordsListBar%sText%s"):format(i, index)]
-		
-		label:SetWidth(max+30)
-	end
-end
-
-local function ResizeList()
-	--print("Call: ResizeList()")
-	local width = 0
-	InfoBarRecordsList:SetHeight((count(RecordsDB[playerName][RecordsDisplay])*18)+18)
-
-	for i=1,InfoBarRecordsList.columns,1 do
-		local lbl = _G[("InfoBarRecordsListBar1Text%s"):format(i)]
-		if lbl ~= nil then
-			--width = width + _G[("InfoBarRecordsListBar1Text%s"):format(i)]:GetWidth() + 2
-			width = width + lbl:GetWidth() + 2
-		end
-	end
-
-	InfoBarRecordsList:SetWidth(width)
-end
-
 function InfoBarRecords_Refresh()
-	--print("Call: InfoBarRecords_Refresh()")
-	--print(("Records count: %d"):format(count(RecordsDB[playerName][RecordsDisplay])))
-
+	--print("InfoBarRecords_Refresh()")
 	local data = RecordsDB[playerName][RecordsDisplay]
 
-	if count(data) > 0 then
+	if CowmonsterUI.Count(data) > 0 then
+		--[[
 		local tbl = {}
 
 		for k,v in pairs(data) do
-			tinsert(tbl, {["name"] = k or "???", ["norm"] = v["norm"] or 0, ["crit"] = v["crit"] or 0, ["normTarget"] = v["normTarget"] or "???", ["critTarget"] = v["critTarget"] or "???", ["normZone"] = v["normZone"] or "???", ["critZone"] = v["critZone"] or "???"})
+			table.insert(tbl, {
+				["name"] = k or "???",
+				["norm"] = v["norm"] or 0,
+				["crit"] = v["crit"] or 0,
+				["normTarget"] = v["normTarget"] or "???",
+				["critTarget"] = v["critTarget"] or "???",
+				["normZone"] = v["normZone"] or "???",
+				["critZone"] = v["critZone"] or "???"
+			})
 		end
-
-		sort(tbl, function(a,b)		
-			if a["crit"] or 0==b["crit"] or 0 then
+		
+		table.sort(tbl, function(a,b)
+			if a.crit or 0 == b.crit or 0 then
 				return a["norm"] or 0 > b["norm"] or 0
 			else
 				return a["crit"] or 0 > b["crit"] or 0
 			end
 		end)
+		]]
+
+		--[[
+		table.sort(data, function(a,b)
+			if a.crit or 0 == b.crit or 0 then
+				return a.norm or 0 > b.norm or 0
+			else
+				return a.crit or 0 > b.crit or 0
+			end
+		end)
+		]]
+
+		table.sort(data, function(a, b)
+			if a == b then return end
+
+			local critA, critB = (a.crit or 0), (b.crit or 0)
+			if critA == critB then
+				local normA, normB = (a.norm or 0), (b.norm or 0)
+				return normA > normB
+			else
+				return critA > critB
+			end
+		end)
 
 		local index = 1
 
-		_G[("InfoBarRecordsListBar%sText1"):format(0)]:SetText("SPELL")
-		_G[("InfoBarRecordsListBar%sText2"):format(0)]:SetText("NORMAL")
-		_G[("InfoBarRecordsListBar%sText3"):format(0)]:SetText("TARGET")
-		_G[("InfoBarRecordsListBar%sText4"):format(0)]:SetText("ZONE")
-		_G[("InfoBarRecordsListBar%sText5"):format(0)]:SetText("CRITICAL")
-		_G[("InfoBarRecordsListBar%sText6"):format(0)]:SetText("TARGET")
-		_G[("InfoBarRecordsListBar%sText7"):format(0)]:SetText("ZONE")
+		local bar = _G["InfoBarRecordsListBar0"] or CowmonsterUI.CreateBar("InfoBarRecords", 0, 0, 100)
 
-		for k,v in ipairs(tbl) do
+		if bar then
+			_G[("InfoBarRecordsListBar%sText1"):format(0)]:SetText("SPELL")
+			_G[("InfoBarRecordsListBar%sText2"):format(0)]:SetText("NORMAL")
+			_G[("InfoBarRecordsListBar%sText3"):format(0)]:SetText("TARGET")
+			_G[("InfoBarRecordsListBar%sText4"):format(0)]:SetText("ZONE")
+			_G[("InfoBarRecordsListBar%sText5"):format(0)]:SetText("CRITICAL")
+			_G[("InfoBarRecordsListBar%sText6"):format(0)]:SetText("TARGET")
+			_G[("InfoBarRecordsListBar%sText7"):format(0)]:SetText("ZONE")
+		end
+
+		for k,v in ipairs(data) do
 			if index == 1 then
-				InfoBarSetText("InfoBarRecords", "%s: %s / %s", v.name, CowmonsterUI.AddComma(v["norm"]), CowmonsterUI.AddComma(v["crit"]))
+				InfoBarSetText("InfoBarRecords", "%s: %s / %s", v.name, CowmonsterUI.AddComma(v.norm), CowmonsterUI.AddComma(v.crit))
 			end
 
-			local bar = _G[("InfoBarRecordsListBar%s"):format(index)] or CreateBar(index)
+			local bar = _G[("InfoBarRecordsListBar%s"):format(index)] or CowmonsterUI.CreateBar("InfoBarRecords", index, 0, 100)
 
 			_G[("InfoBarRecordsListBar%sText1"):format(index)]:SetText(v.name)
 			_G[("InfoBarRecordsListBar%sText2"):format(index)]:SetText(CowmonsterUI.AddComma(v["norm"]))
@@ -151,17 +101,17 @@ function InfoBarRecords_Refresh()
 		end
 
 		for i=1,InfoBarRecordsList.columns,1 do
-			ResizeColumn(i)
+			CowmonsterUI.ResizeColumn("InfoBarRecords", i)
 		end
 
-		ResizeList()
+		CowmonsterUI.ResizeList("InfoBarRecords")
 	end
 end
 
-CreateBar(0)
+--CowmonsterUI.CreateBar("InfoBarRecords", 0, 0, 100)
 
 function InfoBarRecords_OnEnter(self)
-	--print(("Call: InfoBarRecords_OnEnter(%s)"):format(self:GetName()))
+	--print("InfoBarRecords_OnEnter")
 	if UnitAffectingCombat("player") then return end
 
 	InfoBarRecords_Refresh()
@@ -170,12 +120,13 @@ function InfoBarRecords_OnEnter(self)
 end
 
 function InfoBarRecords_OnLeave(self)
-	
+	--print("InfoBarRecords_OnLeave")
 	InfoBarRecordsList:Hide()
 end
 
 function InfoBarRecords_OnClick(self, button)
-	--print(("Call: InfoBarRecords_OnClick(%s, %s)"):format(self:GetName(), button))
+	--print("InfoBarRecords_OnClick")
+	--[[
 	if RecordsDisplay == "dmg" then
 		RecordsDisplay = "heal"
 	elseif RecordsDisplay == "heal" then
@@ -183,14 +134,19 @@ function InfoBarRecords_OnClick(self, button)
 	elseif RecordsDisplay == "absorb" then
 		RecordsDisplay = "dmg"
 	end
+	]]
+	if RecordsDisplay == "dmg" then
+		RecordsDisplay = "heal"
+	else
+		RecordsDisplay = "dmg"
+	end
 
-	print(("InfoBarRecords: switched to %s"):format(RecordsDisplay))
+	--print(("InfoBarRecords: switched to %s"):format(RecordsDisplay))
 
 	InfoBarRecords_Refresh()
 end
 
 function InfoBarRecords_OnUpdate(self, elapsed)
-	--print(("Call: InfoBarRecords_OnUpdate(%s, %s)"):format(self:GetName(), elapsed))
 	self.timer = (self.timer or 0) + elapsed
 
 	if self.timer >= 1 then
@@ -199,16 +155,71 @@ function InfoBarRecords_OnUpdate(self, elapsed)
 	end
 end
 
-function InfoBarRecords_OnEvent(self, event, ...)
-	--print(("Call: InfoBarRecords_OnEvent(%s, %s, ...)"):format(self:GetName(), event))
-	if ( event == "ADDON_LOADED" and select(1, ...) == "CowmonsterUI_InfoBar" ) or event == "VARIABLES_LOADED" then
-		if RecordsDB == nil then RecordsDB = {} end
-		--[[
-		if RecordsDB[playerName] == nil then
-			RecordsDB[playerName] = {["dmg"] = {}, ["heal"] = {}, ["absorb"] = {}}
+local function AddSpellRecord(sourceName, destName, spellName, amount, crit, type)
+	local index = 0
+
+	--print(sourceName, destName, spellName, amount, crit, type)
+
+	for k,v in ipairs(RecordsDB[UnitName("player")][type]) do
+		if v.name == spellName then index = k end
+	end
+
+	if index > 0 then
+		local data = RecordsDB[playerName][type][index]
+
+		if (crit or 0) == 1 then
+			if data.crit < amount then
+				RecordsDB[playerName][type][index].crit = amount
+				RecordsDB[playerName][type][index].critTarget = destName
+				RecordsDB[playerName][type][index].critZone = GetRealZoneText()
+
+				print(("New critical %s record (%d)"):format(spellName, amount))
+			end
+		else
+			if data.norm < amount then
+				RecordsDB[playerName][type][index].norm = amount
+				RecordsDB[playerName][type][index].normTarget = destName
+				RecordsDB[playerName][type][index].normZone = GetRealZoneText()
+
+				print(("New normal %s record (%d)"):format(spellName, amount))
+			end
 		end
-		]]
+	else
+		if (crit or 0) == 1 then
+			table.insert(RecordsDB[playerName][type], {
+				["name"] = spellName,
+				["crit"] = amount,
+				["critTarget"] = destName,
+				["critZone"] = GetRealZoneText(),
+				["norm"] = 0,
+				["normTarget"] = "",
+				["normZone"] = "",
+			})
+
+			print(("New critical %s record (%d)"):format(spellName, amount))
+		else
+			table.insert(RecordsDB[playerName][type], {
+				["name"] = spellName,
+				["crit"] = 0,
+				["critTarget"] = "",
+				["critZone"] = "",
+				["norm"] = amount,
+				["normTarget"] = destName,
+				["normZone"] = GetRealZoneText(),
+			})
+
+			print(("New normal %s record (%d)"):format(spellName, amount))
+		end
+	end
+end
+
+function InfoBarRecords_OnEvent(self, event, ...)
+	--print(("Call: InfoBarRecords_OnEvent(%s, %s)"):format(self:GetName(), event), ...)
+	--if ( event == "ADDON_LOADED" and select(1, ...) == "CowmonsterUI_InfoBar" ) or event == "VARIABLES_LOADED" then
+	if event == "VARIABLES_LOADED" or event == "PLAYER_ENTERING_WORLD" then
+		if RecordsDB == nil then RecordsDB = {} end
 		if playerName == nil then playerName = UnitName("player") end
+
 		InfoBarSetText("InfoBarRecords", "No Records")
 		InfoBarRecords_Refresh()
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
@@ -216,7 +227,8 @@ function InfoBarRecords_OnEvent(self, event, ...)
 
 		--if tContains(mobFilter, destName) ~= true then return end
 
-		--if sourceName == playerName then
+		if sourceName ~= playerName then return end
+
 		if bit.band(sourceFlags, COMBATLOG_OBJECT_TYPE_PLAYER) > 0 and sourceName ~= nil then
 			if RecordsDB == nil then RecordsDB = {} end
 			if RecordsDB[sourceName] == nil then RecordsDB[sourceName] = {} end
@@ -226,126 +238,39 @@ function InfoBarRecords_OnEvent(self, event, ...)
 
 			if string.find(combatEvent, "SWING") then
 				local spell = "Auto Attack"
-				local amount = spellID or 0
-				local crit = spellName or 0
+				local amount = select(9, ...) or 0
+				local crit = select(10, ...) or 0
 
-				if RecordsDB[sourceName]["dmg"][spell] == nil then RecordsDB[sourceName]["dmg"][spell] = {} end
-
-				local data = RecordsDB[sourceName]["dmg"][spell]
-
-				if crit or 0 == 1 then
-					if data.crit or 0 < amount then
-						RecordsDB[sourceName]["dmg"][spell]["crit"] = amount
-						RecordsDB[sourceName]["dmg"][spell]["critTarget"] = destName
-						RecordsDB[sourceName]["dmg"][spell]["critZone"] = GetRealZoneText()
-					end					
-				else
-					if data.norm or 0 < amount then
-						RecordsDB[sourceName]["dmg"][spell]["norm"] = amount
-						RecordsDB[sourceName]["dmg"][spell]["normTarget"] = destName
-						RecordsDB[sourceName]["dmg"][spell]["normZone"] = GetRealZoneText()
-					end
-				end
-				RecordsDB[sourceName]["dmg"][spell]["spellID"] = spellID
+				AddSpellRecord(sourceName, destName, spell, amount, crit, "dmg")
 			elseif string.find(combatEvent, "_DAMAGE") then
-				local spell = spellName
+				local spell = select(10, ...)
 				local amount = amount or 0
-				--local crit = critDmg or 0
-				local crit = critical or 0
+				local crit = select(18, ...) or 0
+
+				--print(...)
+
+				if string.find(combatEvent, "_PERIODIC_") then spell = spell.." (DoT)" end
 
 				if spell and type(spell) == "string" then
-					--print(("%s (%d) %d %d"):format(spell, spellID, amount, crit))
-					--InfoBarRecords_AddRecord(destName, spell, spellID, "dmg", amount, crit)
-					RecordsDB[sourceName]["dmg"][spell] = RecordsDB[sourceName]["dmg"][spell] or {}
-					if crit == 1 then
-						local record = RecordsDB[sourceName]["dmg"][spell]["crit"] or 0
-	
-						if record < amount then
-							RecordsDB[sourceName]["dmg"][spell]["crit"] = amount
-							RecordsDB[sourceName]["dmg"][spell]["critTarget"] = destName
-							RecordsDB[sourceName]["dmg"][spell]["spellID"] = spellID
-							RecordsDB[sourceName]["dmg"][spell]["critZone"] = GetRealZoneText()
-							--ChatFrame:AddMessage(("New %s critical record (%s)"):format(spell, amount))
-
-							--print(("%s hit a new %s crit record %d!"):format(sourceName, spell, amount))
-						end
-					else
-						local record = RecordsDB[sourceName]["dmg"][spell]["norm"] or 0
-	
-						if record < amount then
-							RecordsDB[sourceName]["dmg"][spell]["norm"] = amount
-							RecordsDB[sourceName]["dmg"][spell]["normTarget"] = destName
-							RecordsDB[sourceName]["dmg"][spell]["spellID"] = spellID
-							RecordsDB[sourceName]["dmg"][spell]["normZone"] = GetRealZoneText()
-							--ChatFrame:AddMessage(("New %s normal record (%s)"):format(spell, amount))
-
-							--print(("%s hit a new %s normal record %d!"):format(sourceName, spell, amount))
-						end
-					end
+					AddSpellRecord(sourceName, destName, spell, amount, crit, "dmg")
 				end
 			elseif string.find(combatEvent, "_HEAL") then
 				local spell = spellName
 				local amount = amount or 0
-				local crit = critHeal or 0
+				local crit = blocked or 0
+
+				if string.find(combatEvent, "PERIODIC") then spell = spell.." (HoT)" end
 	
 				if spell and type(spell) == "string" then
-					RecordsDB[sourceName]["heal"][spell] = RecordsDB[sourceName]["heal"][spell] or {}
-	
-					if crit == 1 then
-						local record = RecordsDB[sourceName]["heal"][spell]["crit"] or 0
-	
-						if record < amount then
-							RecordsDB[sourceName]["heal"][spell]["crit"] = amount
-							RecordsDB[sourceName]["heal"][spell]["critTarget"] = destName
-							RecordsDB[sourceName]["heal"][spell]["spellID"] = spellID
-							RecordsDB[sourceName]["heal"][spell]["critZone"] = GetRealZoneText()
-
-							--print(("%s hit a new %s crit record %d!"):format(sourceName, spell, amount))
-						end
-					else
-						local record = RecordsDB[sourceName]["heal"][spell]["norm"] or 0
-	
-						if record < amount then
-							RecordsDB[sourceName]["heal"][spell]["norm"] = amount
-							RecordsDB[sourceName]["heal"][spell]["normTarget"] = destName
-							RecordsDB[sourceName]["heal"][spell]["spellID"] = spellID
-							RecordsDB[sourceName]["heal"][spell]["normZone"] = GetRealZoneText()
-
-							--print(("%s hit a new %s crit record %d!"):format(sourceName, spell, amount))
-						end
-					end
+					AddSpellRecord(sourceName, destName, spell, amount, crit, "heal")
 				end
 			elseif string.find(combatEvent, "_ABSORBED") then
 				local spell = spellName
 				local amount = amount or 0
-				local crit = critHeal or 0
+				local crit = blocked or 0
 				
 				if spell and type(spell) == "string" then
-					RecordsDB[sourceName].absorb[spell] = RecordsDB[sourceName].absorb[spell] or {}
-					
-					if crit == 1 then
-						local record = RecordsDB[sourceName].absorb[spell]["crit"] or 0
-						
-						if record < amount then
-							RecordsDB[sourceName].absorb[spell]["crit"] = amount
-							RecordsDB[sourceName].absorb[spell]["critTarget"] = destName
-							RecordsDB[sourceName].absorb[spell]["spellID"] = spellID
-							RecordsDB[sourceName].absorb[spell]["critZone"] = GetRealZoneText()
-
-							--print(("%s hit a new %s crit record %d!"):format(sourceName, spell, amount))
-						end
-					else
-						local record = RecordsDB[sourceName].absorb[spell]["norm"] or 0
-						
-						if record < amount then
-							RecordsDB[sourceName].absorb[spell]["norm"] = amount
-							RecordsDB[sourceName].absorb[spell]["normTarget"] = destName
-							RecordsDB[sourceName].absorb[spell]["spellID"] = spellID
-							RecordsDB[sourceName].absorb[spell]["normZone"] = GetRealZoneText()
-
-							--print(("%s hit a new %s normal record %d!"):format(sourceName, spell, amount))
-						end
-					end
+					AddSpellRecord(sourceName, destName, spell, amount, crit, "absorb")
 				end
 			end
 		end
@@ -360,6 +285,12 @@ SlashCmdList["RECORDS"] = function(input)
 		DEFAULT_CHAT_FRAME:AddMessage("Records have been reset.")
 		InfoBarSetText("InfoBarRecords", "No Records")
 	else
-		DEFAULT_CHAT_FRAME:AddMessage("Records: "..input)
+		--DEFAULT_CHAT_FRAME:AddMessage("Records: "..input)
+		for k,v in pairs(RecordsDB[playerName]) do
+			print("=====[ "..k.." ]=====")
+			for a,b in pairs(v) do
+				print(a, b.norm, b.crit)
+			end
+		end
 	end
 end

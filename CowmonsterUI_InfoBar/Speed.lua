@@ -23,7 +23,7 @@ function InfoBarSpeed_OnUpdate(self, elapsed)
 			if not (IsSwimming() or IsFlying()) then
 				self.currentSpeed = CowmonsterUI.Round(iSpeed/7 * 100)
 			else
-				self.currentSpeed = CowmonsterUI.Round((iSpeed/7 * 100) * math.cos(GetUnitPitch(MonkeySpeedTemp.currentUnit)))
+				self.currentSpeed = CowmonsterUI.Round((iSpeed/7 * 100) * math.cos(GetUnitPitch(self.currentUnit or "player")))
 			end
 			if self.currentSpeed == 0 then
 				InfoBarSetText("InfoBarSpeed", "Speed: |cffcccccc%d%%|r", self.currentSpeed)

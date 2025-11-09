@@ -9,6 +9,7 @@ f.columns = 8 -- name, race, class, rank, level, zone, note, officer note
 f:SetFrameStrata("FULLSCREEN")
 f:SetBackdrop( { bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile = nil, tile = true, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
 
+--[[
 local function CreateBar(index)
 	local bar = CreateFrame("StatusBar", ("InfoBarGuildListBar%s"):format(index), InfoBarGuildList)
 
@@ -25,14 +26,10 @@ local function CreateBar(index)
 	bar:SetHeight(FONT_SIZE)
 	bar:SetMinMaxValues(0, 80)
 	bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
-	--bar:GetStatusBarTexture():SetHorizTile(false)
 	bar:SetStatusBarColor(0, 1, 0)
 	bar:SetValue(0)
 
 	for i=1,InfoBarGuildList.columns,1 do
-		--Add labels to the bar
-		--ctl:SetFont("Fonts\\ARIALN.ttf", FontSize, "OUTLINE")
-		--local t = bar:CreateFontString(("InfoBarGuildListBar%sText%s"):format(index, i), "OVERLAY", "NumberFont_Outline_Med")
 		local t = bar:CreateFontString(("InfoBarGuildListBar%sText%s"):format(index, i), "OVERLAY")
 		t:SetFont("Fonts\\ARIALN.ttf", FONT_SIZE, "OUTLINE")
 		if i == 1 then
@@ -46,7 +43,9 @@ local function CreateBar(index)
 
 	return bar
 end
+]]
 
+--[[
 local function ResizeColumn(index)
 	local max = 0
 
@@ -78,11 +77,25 @@ local function ResizeList()
 
 	InfoBarGuildList:SetWidth(width)
 end
+]]
 
 function InfoBarGuild_Refresh()
 	sort(GuildMembersDB, function(a,b) return a.rankIndex<b.rankIndex end)
 	local index = 1
 
+	local bar = _G["InfoBarGuildListBar0"] or CowmonsterUI.CreateBar("InfoBarGuild", 0, 0, 80)
+
+	if bar then
+		_G[("InfoBarGuildListBar%sText1"):format(0)]:SetText("NAME")
+		_G[("InfoBarGuildListBar%sText2"):format(0)]:SetText("RANK")
+		_G[("InfoBarGuildListBar%sText3"):format(0)]:SetText("LVL")
+		_G[("InfoBarGuildListBar%sText4"):format(0)]:SetText("CLASS")
+		_G[("InfoBarGuildListBar%sText5"):format(0)]:SetText("ZONE")
+		_G[("InfoBarGuildListBar%sText6"):format(0)]:SetText("PUBLIC NOTE")
+		_G[("InfoBarGuildListBar%sText7"):format(0)]:SetText("OFFICER NOTE")		
+	end
+
+	--[[
 	_G[("InfoBarGuildListBar%sText1"):format(0)]:SetText("NAME")
 	_G[("InfoBarGuildListBar%sText2"):format(0)]:SetText("RANK")
 	_G[("InfoBarGuildListBar%sText3"):format(0)]:SetText("LVL")
@@ -90,10 +103,11 @@ function InfoBarGuild_Refresh()
 	_G[("InfoBarGuildListBar%sText5"):format(0)]:SetText("ZONE")
 	_G[("InfoBarGuildListBar%sText6"):format(0)]:SetText("PUBLIC NOTE")
 	_G[("InfoBarGuildListBar%sText7"):format(0)]:SetText("OFFICER NOTE")
+	]]
 
 	for k,v in ipairs(GuildMembersDB) do
 		if v.online then
-			local bar = _G[("InfoBarGuildListBar%s"):format(index)] or CreateBar(index)
+			local bar = _G[("InfoBarGuildListBar%d"):format(index)] or CowmonsterUI.CreateBar("InfoBarGuild", index, 0, 80)
 
 			_G[("InfoBarGuildListBar%sText1"):format(index)]:SetText(v.name)
 			_G[("InfoBarGuildListBar%sText2"):format(index)]:SetText(v.rank)
@@ -107,11 +121,16 @@ function InfoBarGuild_Refresh()
 
 			bar:SetValue(v.level)
 
+
+			local r, g, b, a = CowmonsterUI.GetClassColor(v.class)
+			bar:SetStatusBarColor(r, g, b, a)
+			--[[
 			local class = strupper(v.class:gsub(" ", ""))
 
 			if RAID_CLASS_COLORS[class] then
 				bar:SetStatusBarColor(RAID_CLASS_COLORS[class].r, RAID_CLASS_COLORS[class].g, RAID_CLASS_COLORS[class].b, 1)
 			end
+			]]
 
 			bar:Show()
 		end
@@ -122,13 +141,13 @@ function InfoBarGuild_Refresh()
 	end
 
 	for i=1,InfoBarGuildList.columns,1 do
-		ResizeColumn(i)
+		CowmonsterUI.ResizeColumn("InfoBarGuild", i)
 	end
 
-	ResizeList()
+	CowmonsterUI.ResizeList("InfoBarGuild")
 end
 
-CreateBar(0)
+--local titleBar = _G["InfoBarGuildListBar0"] or CowmonsterUI.CreateBar("InfoBarGuild", 0)
 
 function InfoBarGuild_OnEnter(self)
 	if UnitAffectingCombat("player") then return end

@@ -1,3 +1,13 @@
+function CowmonsterUI.Count(tbl)
+	local retVal = 0
+
+	for _, _ in pairs(tbl) do
+		retVal = retVal + 1
+	end
+
+	return retVal
+end
+
 function CowmonsterUI.Round(x)
 	if(x - floor(x) > 0.5) then x = x + 0.5 end
 	return floor(x)

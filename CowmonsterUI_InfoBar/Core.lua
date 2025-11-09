@@ -110,10 +110,21 @@ local InfoBarStrings = {
 		},
 		["Events"] = {
 			"COMBAT_LOG_EVENT_UNFILTERED",
-			"ADDON_LOADED",
 			"VARIABLES_LOADED",
 		},
+		["Columns"] = {
+			"SPELL",
+			"NORMAL",
+			"TARGET",
+			"ZONE",
+			"CRITICAL",
+			"TARGET",
+			"ZONE",
+		},
+		["minVal"] = 0,
+		["maxVal"] = 100,
 	},
+	--[[
 	{
 		["Name"] = "InfoBarDPS",
 		["JustifyH"] = "LEFT",
@@ -129,6 +140,7 @@ local InfoBarStrings = {
 			"COMBATLOG_EVENT_UNFILTERED",
 		},
 	},
+	]]
 	{
 		["Name"] = "InfoBarGuild",
 		["JustifyH"] = "LEFT",
@@ -225,6 +237,74 @@ local InfoBarStrings = {
 ]]
 }
 
+function CowmonsterUI.CreateBar(parent, index, minVal, maxVal)
+	local list = _G[("%sList"):format(parent)]
+	local bar = CreateFrame("StatusBar", ("%sListBar%d"):format(parent, index), _G[("%sList"):format(parent)])
+
+	list.numRows = index
+
+        if index == 0 then
+                bar:SetPoint("TOPLEFT", list, "TOPLEFT", 4, -4)
+                bar:SetPoint("TOPRIGHT", list, "TOPRIGHT", -4, -4)
+        else
+            	bar:SetPoint("TOPLEFT", _G[("%sListBar%d"):format(parent, (index-1))], "BOTTOMLEFT", 0, -2)
+                bar:SetPoint("TOPRIGHT", _G[("%sListBar%d"):format(parent, (index-1))], "BOTTOMRIGHT", 0, -2)
+        end
+
+	bar:SetHeight(12)
+        bar:SetMinMaxValues(minVal, maxVal)
+        bar:SetStatusBarTexture("Interface\\TargetingFrame\\UI-StatusBar")
+        bar:SetStatusBarColor(0, 1, 0)
+        bar:SetValue(0)
+
+        for i=1,list.columns,1 do
+                local t = bar:CreateFontString(("%sListBar%dText%d"):format(parent, index, i), "OVERLAY")
+                t:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE")
+                if i == 1 then
+                        t:SetPoint("LEFT", bar, "LEFT", 2, 0)
+                else
+                    	t:SetPoint("LEFT", _G[("%sListBar%dText%d"):format(parent, index, (i-1))], "RIGHT", 0, 0)
+                end
+
+                t:SetJustifyH("LEFT")
+        end
+
+        return bar
+end
+
+function CowmonsterUI.CreateList(parent, columns)
+	local f = CreateFrame("Frame", parent.."List", InfoBarFrame)
+	f.columns = columns
+	f:SetFrameStrata("FULLSCREEN")
+	f:SetBackdrop( { bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile = nil, tile = true, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
+end
+
+function CowmonsterUI.ResizeColumn(parent, index)
+        local max = 0
+
+	for i=0, _G[("%sList"):format(parent)].numRows, 1 do
+		local label = _G[("%sListBar%dText%d"):format(parent, i, index)]
+		if label:GetStringWidth() > max then max = label:GetStringWidth() end
+	end
+
+	for i=0, _G[("%sList"):format(parent)].numRows, 1 do
+		local label = _G[("%sListBar%dText%d"):format(parent, i, index)]
+		label:SetWidth(max+30)
+	end
+end
+
+function CowmonsterUI.ResizeList(parent)
+        local width = 0
+	local list = _G[("%sList"):format(parent)]
+	list:SetHeight((list.numRows*14)+14)
+
+        for i=1,list.columns,1 do
+                width = width + _G[("%sListBar0Text%d"):format(parent, i)]:GetWidth() + 2
+        end
+
+        list:SetWidth(width)
+end
+
 local f = CreateFrame("Frame", "InfoBarFrame", UIParent)
 local t = CreateFrame("GameTooltip", "InfoBarTooltip", UIParent, "GameTooltipTemplate")
 
@@ -255,6 +335,15 @@ for k, v in ipairs(InfoBarStrings) do
 	if v.Events then
 		for i, a in pairs(v.Events) do
 			b:RegisterEvent(a)
+		end
+	end
+
+	if v.Columns then
+		CowmonsterUI.CreateList(v.Name, #v.Columns)
+		CowmonsterUI.CreateBar(v.Name, 0, v.minVal, v.maxVal)
+
+		for i, a in pairs(v.Columns) do
+			_G[("%sListBar%dText%d"):format(v.Name, 0, i)]:SetText(a)
 		end
 	end
 
