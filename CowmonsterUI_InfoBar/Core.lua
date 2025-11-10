@@ -293,10 +293,12 @@ function CowmonsterUI.ResizeColumn(parent, index)
 	end
 end
 
-function CowmonsterUI.ResizeList(parent)
+function CowmonsterUI.ResizeList(parent, rows)
         local width = 0
 	local list = _G[("%sList"):format(parent)]
-	list:SetHeight((list.numRows*14)+14)
+	--list:SetHeight((list.numRows*14)+14)
+	--list:SetHeight((rows*14)+14)
+	list:SetHeight(rows*14)
 
         for i=1,list.columns,1 do
                 width = width + _G[("%sListBar0Text%d"):format(parent, i)]:GetWidth() + 2

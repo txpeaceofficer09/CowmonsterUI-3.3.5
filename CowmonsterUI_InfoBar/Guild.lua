@@ -144,7 +144,7 @@ function InfoBarGuild_Refresh()
 		CowmonsterUI.ResizeColumn("InfoBarGuild", i)
 	end
 
-	CowmonsterUI.ResizeList("InfoBarGuild")
+	CowmonsterUI.ResizeList("InfoBarGuild", index)
 end
 
 --local titleBar = _G["InfoBarGuildListBar0"] or CowmonsterUI.CreateBar("InfoBarGuild", 0)

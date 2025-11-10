@@ -104,7 +104,7 @@ function InfoBarRecords_Refresh()
 			CowmonsterUI.ResizeColumn("InfoBarRecords", i)
 		end
 
-		CowmonsterUI.ResizeList("InfoBarRecords")
+		CowmonsterUI.ResizeList("InfoBarRecords", index)
 	end
 end
 
