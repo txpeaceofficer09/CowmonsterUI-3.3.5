@@ -24,6 +24,13 @@ hooksecurefunc(PetActionBarFrame, "SetPoint", function(self)
 	end
 end)
 
+hooksecurefunc(MultiCastActionBarFrame, "SetPoint", function(pointA, relativeTo, pointB, x, y)
+	if y == 30 then
+		MultiCastActionBarFrame:ClearAllPoints()
+		MultiCastActionBarFrame:SetPoint("BOTTOMLEFT", ExtraBarButton2, "TOPLEFT", 0, 4)
+	end
+end)
+
 hooksecurefunc(ShapeshiftBarFrame, "SetPoint", function(self)
 	for i=1,10,1 do
 		local button, lastButton = _G["ShapeshiftButton"..i], _G["ShapeshiftButton"..(i-1)]
@@ -92,6 +99,7 @@ local function OnEvent(self, event, ...)
 	elseif event == "UPDATE_BINDINGS" then
 		UpdateBindings()
 	elseif event == "VARIABLES_LOADED" or event == "PLAYER_ENTERING_WORLD" then
+		SetActionBarToggles(1, 1, 1, 1, 1)
 		MainMenuBar:ClearAllPoints()
 		MainMenuBar:SetPoint("BOTTOM", UIParent, "BOTTOM", ACTIONBAR_OFFSETX, ACTIONBAR_OFFSETY)
 
