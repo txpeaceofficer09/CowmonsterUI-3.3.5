@@ -12,44 +12,9 @@ f:SetFrameStrata("FULLSCREEN")
 f:SetBackdrop( { bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile = nil, tile = true, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
 
 function InfoBarRecords_Refresh()
-	--print("InfoBarRecords_Refresh()")
 	local data = RecordsDB[playerName][RecordsDisplay]
 
 	if CowmonsterUI.Count(data) > 0 then
-		--[[
-		local tbl = {}
-
-		for k,v in pairs(data) do
-			table.insert(tbl, {
-				["name"] = k or "???",
-				["norm"] = v["norm"] or 0,
-				["crit"] = v["crit"] or 0,
-				["normTarget"] = v["normTarget"] or "???",
-				["critTarget"] = v["critTarget"] or "???",
-				["normZone"] = v["normZone"] or "???",
-				["critZone"] = v["critZone"] or "???"
-			})
-		end
-		
-		table.sort(tbl, function(a,b)
-			if a.crit or 0 == b.crit or 0 then
-				return a["norm"] or 0 > b["norm"] or 0
-			else
-				return a["crit"] or 0 > b["crit"] or 0
-			end
-		end)
-		]]
-
-		--[[
-		table.sort(data, function(a,b)
-			if a.crit or 0 == b.crit or 0 then
-				return a.norm or 0 > b.norm or 0
-			else
-				return a.crit or 0 > b.crit or 0
-			end
-		end)
-		]]
-
 		table.sort(data, function(a, b)
 			if a == b then return end
 
@@ -236,13 +201,14 @@ function InfoBarRecords_OnEvent(self, event, ...)
 			if RecordsDB[sourceName]["heal"] == nil then RecordsDB[sourceName]["heal"] = {} end
 			if RecordsDB[sourceName]["absorb"] == nil then RecordsDB[sourceName]["absorb"] = {} end
 
-			if string.find(combatEvent, "SWING") then
+			--if string.find(combatEvent, "SWING") then
+			if combatEvent == "SWING_DAMAGE" then
 				local spell = "Auto Attack"
 				local amount = select(9, ...) or 0
 				local crit = select(10, ...) or 0
 
 				AddSpellRecord(sourceName, destName, spell, amount, crit, "dmg")
-			elseif string.find(combatEvent, "_DAMAGE") then
+			elseif string.find(combatEvent, "_DAMAGE") and IsSpellKnown(spellID) then
 				local spell = select(10, ...)
 				local amount = amount or 0
 				local crit = select(18, ...) or 0
@@ -254,7 +220,7 @@ function InfoBarRecords_OnEvent(self, event, ...)
 				if spell and type(spell) == "string" then
 					AddSpellRecord(sourceName, destName, spell, amount, crit, "dmg")
 				end
-			elseif string.find(combatEvent, "_HEAL") then
+			elseif string.find(combatEvent, "_HEAL") and IsSpellKnown(spellID) then
 				local spell = spellName
 				local amount = amount or 0
 				local crit = blocked or 0
@@ -264,7 +230,7 @@ function InfoBarRecords_OnEvent(self, event, ...)
 				if spell and type(spell) == "string" then
 					AddSpellRecord(sourceName, destName, spell, amount, crit, "heal")
 				end
-			elseif string.find(combatEvent, "_ABSORBED") then
+			elseif string.find(combatEvent, "_ABSORBED") and IsSpellKnown(spellID) then
 				local spell = spellName
 				local amount = amount or 0
 				local crit = blocked or 0
