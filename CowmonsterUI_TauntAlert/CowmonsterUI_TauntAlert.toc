@@ -1,0 +1,5 @@
+## Interface: 30300
+## Author: SoonBeSteak
+## Title: CowmonsterUI_TauntAlert
+## Notes: Let you know when someone or their pet uses a taunt.
+Core.lua
