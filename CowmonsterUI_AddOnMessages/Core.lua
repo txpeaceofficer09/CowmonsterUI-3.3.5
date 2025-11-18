@@ -3,6 +3,60 @@ local f = CreateFrame("Frame", "AddOnMessagesFrame", UIParent)
 f.messages = {}
 f.channel = "AddOnMessages"
 
+local ErrorFilter = {
+	"send message of this type until you reach level",
+	"your target is dead",
+	"there is nothing to attack",
+	"not enough rage",
+	"not enough energy",
+	"that ability requires combo points",
+	"not enough runic power",
+	"not enough runes",
+	"invalid target",
+	"you have no target",
+	"you cannot attack that target",
+	"spell is not ready yet",
+	"ability is not ready yet",
+	"you can't do that yet",
+	"you are too far away",
+	"out of range",
+	"another action is in progress",
+	"not enough mana",
+	"not enough focus"
+}
+
+--[[
+local origAddMessage = UIErrorsFrame:AddMessage
+function UIErrorsFrame:AddMessage(msg, r, g, b, a)
+	for k, v in ipairs(ErrorFilter) do
+		if string.find( string.lower(msg), v ) then
+			return
+		end
+	end
+
+	return origAddMessage(msg, r, g, b, a)
+end
+]]
+
+local origErrorOnEvent = UIErrorsFrame:GetScript("OnEvent")
+UIErrorsFrame:SetScript("OnEvent", function(self, event, ...)
+	if AddOnMessagesFrame[event] then
+		return AddOnMessagesFrame[event](self, event, ...)
+	else
+		return origErrorOnEvent(self, event, ...)
+	end
+end)
+
+function AddOnMessagesFrame:UI_ERROR_MESSAGE(event, name, ...)
+	for k, v in ipairs(ErrorFilter) do
+		if( string.find( string.lower(name), v ) ) then
+			return
+		end
+	end
+
+	return origErrorOnEvent(self, event, name, ...)
+end
+
 function QueueAddOnMessage(msg)
 	for _, existingMsg in ipairs(f.messages) do
 		if existingMsg == msg then
