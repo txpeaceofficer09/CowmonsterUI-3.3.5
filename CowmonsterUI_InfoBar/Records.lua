@@ -76,7 +76,6 @@ end
 --CowmonsterUI.CreateBar("InfoBarRecords", 0, 0, 100)
 
 function InfoBarRecords_OnEnter(self)
-	--print("InfoBarRecords_OnEnter")
 	if UnitAffectingCombat("player") then return end
 
 	InfoBarRecords_Refresh()
@@ -85,12 +84,10 @@ function InfoBarRecords_OnEnter(self)
 end
 
 function InfoBarRecords_OnLeave(self)
-	--print("InfoBarRecords_OnLeave")
 	InfoBarRecordsList:Hide()
 end
 
 function InfoBarRecords_OnClick(self, button)
-	--print("InfoBarRecords_OnClick")
 	--[[
 	if RecordsDisplay == "dmg" then
 		RecordsDisplay = "heal"
@@ -105,8 +102,6 @@ function InfoBarRecords_OnClick(self, button)
 	else
 		RecordsDisplay = "dmg"
 	end
-
-	--print(("InfoBarRecords: switched to %s"):format(RecordsDisplay))
 
 	InfoBarRecords_Refresh()
 end
@@ -123,8 +118,6 @@ end
 local function AddSpellRecord(sourceName, destName, spellName, amount, crit, type)
 	local index = 0
 
-	--print(sourceName, destName, spellName, amount, crit, type)
-
 	for k,v in ipairs(RecordsDB[UnitName("player")][type]) do
 		if v.name == spellName then index = k end
 	end
@@ -138,7 +131,7 @@ local function AddSpellRecord(sourceName, destName, spellName, amount, crit, typ
 				RecordsDB[playerName][type][index].critTarget = destName
 				RecordsDB[playerName][type][index].critZone = GetRealZoneText()
 
-				print(("New critical %s record (%d)"):format(spellName, amount))
+				--print(("New critical %s record (%d)"):format(spellName, amount))
 			end
 		else
 			if data.norm < amount then
@@ -146,7 +139,7 @@ local function AddSpellRecord(sourceName, destName, spellName, amount, crit, typ
 				RecordsDB[playerName][type][index].normTarget = destName
 				RecordsDB[playerName][type][index].normZone = GetRealZoneText()
 
-				print(("New normal %s record (%d)"):format(spellName, amount))
+				--print(("New normal %s record (%d)"):format(spellName, amount))
 			end
 		end
 	else
@@ -161,7 +154,7 @@ local function AddSpellRecord(sourceName, destName, spellName, amount, crit, typ
 				["normZone"] = "",
 			})
 
-			print(("New critical %s record (%d)"):format(spellName, amount))
+			--print(("New critical %s record (%d)"):format(spellName, amount))
 		else
 			table.insert(RecordsDB[playerName][type], {
 				["name"] = spellName,
@@ -173,14 +166,12 @@ local function AddSpellRecord(sourceName, destName, spellName, amount, crit, typ
 				["normZone"] = GetRealZoneText(),
 			})
 
-			print(("New normal %s record (%d)"):format(spellName, amount))
+			--print(("New normal %s record (%d)"):format(spellName, amount))
 		end
 	end
 end
 
 function InfoBarRecords_OnEvent(self, event, ...)
-	--print(("Call: InfoBarRecords_OnEvent(%s, %s)"):format(self:GetName(), event), ...)
-	--if ( event == "ADDON_LOADED" and select(1, ...) == "CowmonsterUI_InfoBar" ) or event == "VARIABLES_LOADED" then
 	if event == "VARIABLES_LOADED" or event == "PLAYER_ENTERING_WORLD" then
 		if RecordsDB == nil then RecordsDB = {} end
 		if playerName == nil then playerName = UnitName("player") end
