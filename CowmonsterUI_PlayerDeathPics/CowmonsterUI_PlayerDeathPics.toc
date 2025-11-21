@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: CowmonsterUI_PlayerDeathPics
+## Notes: Take a picture to remember that time you died.
+## Author: SoonBeSteak @ Frostmourne
+## Version: 1.0.1
+## Dependencies: CowmonsterUI
+Core.lua
