@@ -57,9 +57,23 @@ function AddOnMessagesFrame:UI_ERROR_MESSAGE(event, name, ...)
 	return origErrorOnEvent(self, event, name, ...)
 end
 
+local function GetPrefix(msg)
+	local index = string.find(msg, ":")
+
+	if index and index > 1 then
+		return gsub(msg, 1, index - 1)
+	else
+		return nil
+	end
+end
+
 function QueueAddOnMessage(msg)
-	for _, existingMsg in ipairs(f.messages) do
-		if existingMsg == msg then
+	if UnitLevel("player") < 15 then return end
+
+	for i, existingMsg in ipairs(f.messages) do
+		if existingMsg == msg then return end
+		if GetPrefix(existingMsg) == GetPrefix(msg) and GetPrefix(existingMsg) ~= nil then
+			f.messages[i] = msg
 			return
 		end
 	end
@@ -101,7 +115,7 @@ local function OnEvent(self, event, ...)
 
 		if name == UnitName("player") then
 			self.lastMessageTime = GetTime()
-			self.counter = (self.counter or 0) + 1
+			--self.counter = (self.counter or 0) + 1
 		end
 	end
 end
@@ -122,11 +136,12 @@ f:RegisterEvent("RAID_ROSTER_UPDATE")
 
 local function OnUpdate(self, elapsed)
 	self.timer = (self.timer or 0) + elapsed
-	self.timer2 = (self.timer2 or 0) + elapsed
+	--self.timer2 = (self.timer2 or 0) + elapsed
 	self.lastMessageTime = self.lastMessageTime or GetTime()
 
 	if self.timer > 0.2 then
-		if GetTime() - self.lastMessageTime > 5 and (self.counter or 0) < 3 then
+		--if GetTime() - self.lastMessageTime > 10 and (self.counter or 0) < 3 then
+		if GetTime() - self.lastMessageTime > 10 then
 			if #(self.messages) > 0 then
 				SendAddOnMessage()
 			end
@@ -135,13 +150,15 @@ local function OnUpdate(self, elapsed)
 		self.timer = 0
 	end
 
-	if self.timer2 >= 5 then
+	--[[
+	if self.timer2 >= 10 then
 		if (self.counter or 0) > 0 then
 			self.counter = self.counter - 1
 		end
 
 		self.timer2 = 0
 	end
+	]]
 end
 
 f:SetScript("OnEvent", OnEvent)

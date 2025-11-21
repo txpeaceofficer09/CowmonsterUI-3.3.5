@@ -76,7 +76,11 @@ function CowmonsterUI.GetCoinTextureString(copper)
 	local silver = math.floor((copper % 10000) / 100)
 	local remainingCopper = copper % 100
 
-	return ("%d|T%s:0|t %d|T%s:0|t %d|T%s:0|t"):format(gold, "Interface\\Icons\\INV_Misc_Coin_01", silver, "Interface\\Icons\\INV_Misc_Coin_03", remainingCopper, "Interface\\Icons\\INV_Misc_Coin_02")
+	local goldTexture = "Interface\\MoneyFrame\\UI-GoldIcon"
+	local silverTexture = "Interface\\MoneyFrame\\UI-SilverIcon"
+	local copperTexture = "Interface\\MoneyFrame\\UI-CopperIcon"
+
+	return ("%d|T%s:0|t %d|T%s:0|t %d|T%s:0|t"):format(gold, goldTexture, silver, silverTexture, remainingCopper, copperTexture)
 end
 
 function CowmonsterUI.isInCombat()
