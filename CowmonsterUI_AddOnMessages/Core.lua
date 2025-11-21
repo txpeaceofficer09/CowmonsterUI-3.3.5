@@ -3,6 +3,8 @@ local f = CreateFrame("Frame", "AddOnMessagesFrame", UIParent)
 f.messages = {}
 f.channel = "AddOnMessages"
 
+local MESSAGE_DELAY = 5
+
 local ErrorFilter = {
 	"send message of this type until you reach level",
 	"your target is dead",
@@ -140,8 +142,8 @@ local function OnUpdate(self, elapsed)
 	self.lastMessageTime = self.lastMessageTime or GetTime()
 
 	if self.timer > 0.2 then
-		--if GetTime() - self.lastMessageTime > 10 and (self.counter or 0) < 3 then
-		if GetTime() - self.lastMessageTime > 10 then
+		--if GetTime() - self.lastMessageTime > MESSAGE_DELAY and (self.counter or 0) < 3 then
+		if GetTime() - self.lastMessageTime > MESSAGE_DELAY then
 			if #(self.messages) > 0 then
 				SendAddOnMessage()
 			end
@@ -151,7 +153,7 @@ local function OnUpdate(self, elapsed)
 	end
 
 	--[[
-	if self.timer2 >= 10 then
+	if self.timer2 >= MESSAGE_DELAY then
 		if (self.counter or 0) > 0 then
 			self.counter = self.counter - 1
 		end
