@@ -14,7 +14,7 @@ f:SetBackdrop( { bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", edg
 function InfoBarRecords_Refresh()
 	if not RecordsDB then RecordsDB = {} end
 	if not RecordsDB[playerName] then RecordsDB[playerName] = {} end
-	if not RecordsDB[playerName][RecordsDisplay] = {} end
+	if not RecordsDB[playerName][RecordsDisplay] then RecordsDB[playerName][RecordsDisplay] = {} end
 
 	local data = RecordsDB[playerName][RecordsDisplay]
 

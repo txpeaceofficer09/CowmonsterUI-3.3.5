@@ -74,9 +74,6 @@ RaidCC_Config = {
 	["lock"] = false,
 }
 
---f:SetWidth(barWidth)
---f:SetHeight(barSize)
-
 f:SetSize(barWidth, barSize)
 
 f:SetPoint(RaidCC_Config.p, UIParent, RaidCC_Config.p, RaidCC_Config.x, RaidCC_Config.y)
@@ -271,9 +268,8 @@ local function OnEvent(self, event, ...)
 		if subevent == "UNIT_DIED" then
 			cc[dstGUID] = nil
 			targets[dstGUID] = nil
-		elseif subevent == "SPELL_CAST_SUCCESS" or subevent == "SPELL_AURA_APPLIED" or subevent == "SPELL_AURA_REFRESH" then
+		elseif subevent == "SPELL_CAST_SUCCESS" or subevent == "SPELL_AURA_APPLIED" or subevent == "SPELL_AURA_REFRESH" or subevent == "SPELL_AURA_DOSE_APPLIED" then
 			if ( bit.band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_MINE) > 0 or bit.band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_PARTY) > 0 or bit.band(srcFlags, COMBATLOG_OBJECT_AFFILIATION_RAID) > 0 ) then
-				--if spells[spellID] ~= nil then
 				local unit = GetUnitByGUID(dstGUID)
 				local duration, remaining = GetAuraInfo(unit, spellID)
 
@@ -285,7 +281,6 @@ local function OnEvent(self, event, ...)
 					cc[dstGUID][spellID].startTime = GetTime()
 					cc[dstGUID][spellID].duration = duration
 					cc[dstGUID][spellID].endTime = GetTime() + remaining
-					--cc[dstGUID][spellID].endTime = GetTime() + spells[spellID]
 				end
 
 				if RaidCC_Config.debug ~= nil and RaidCC_Config.debug ~= false then
