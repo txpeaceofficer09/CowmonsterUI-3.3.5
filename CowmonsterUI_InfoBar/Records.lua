@@ -12,6 +12,10 @@ f:SetFrameStrata("FULLSCREEN")
 f:SetBackdrop( { bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile = nil, tile = true, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
 
 function InfoBarRecords_Refresh()
+	if not RecordsDB then RecordsDB = {} end
+	if not RecordsDB[playerName] then RecordsDB[playerName] = {} end
+	if not RecordsDB[playerName][RecordsDisplay] = {} end
+
 	local data = RecordsDB[playerName][RecordsDisplay]
 
 	if CowmonsterUI.Count(data) > 0 then
