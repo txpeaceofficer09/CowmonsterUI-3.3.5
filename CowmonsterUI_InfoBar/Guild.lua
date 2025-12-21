@@ -19,24 +19,30 @@ function InfoBarGuild_Refresh()
 		_G[("InfoBarGuildListBar%sText7"):format(0)]:SetText("OFFICER NOTE")		
 	end
 
+	local barCount = 1
+
 	while GetGuildRosterInfo(index) ~= nil do
 		local name, rank, rankIndex, level, class, zone, note, officernote, online = GetGuildRosterInfo(index)
-		local bar = _G[("InfoBarGuildListBar%d"):format(index)] or CowmonsterUI.CreateBar("InfoBarGuild", index, 0, 80)
+		if online then
+			local bar = _G[("InfoBarGuildListBar%d"):format(index)] or CowmonsterUI.CreateBar("InfoBarGuild", barCount, 0, 80)
 
-		_G[("InfoBarGuildListBar%sText1"):format(index)]:SetText(name)
-		_G[("InfoBarGuildListBar%sText2"):format(index)]:SetText(rank)
-		_G[("InfoBarGuildListBar%sText3"):format(index)]:SetText(level)
-		_G[("InfoBarGuildListBar%sText4"):format(index)]:SetText(class)
-		_G[("InfoBarGuildListBar%sText5"):format(index)]:SetText(zone)
-		_G[("InfoBarGuildListBar%sText6"):format(index)]:SetText(note)
-		_G[("InfoBarGuildListBar%sText7"):format(index)]:SetText(officernote)
+			_G[("InfoBarGuildListBar%sText1"):format(index)]:SetText(name)
+			_G[("InfoBarGuildListBar%sText2"):format(index)]:SetText(rank)
+			_G[("InfoBarGuildListBar%sText3"):format(index)]:SetText(level)
+			_G[("InfoBarGuildListBar%sText4"):format(index)]:SetText(class)
+			_G[("InfoBarGuildListBar%sText5"):format(index)]:SetText(zone)
+			_G[("InfoBarGuildListBar%sText6"):format(index)]:SetText(note)
+			_G[("InfoBarGuildListBar%sText7"):format(index)]:SetText(officernote)
 		
-		bar:SetValue(level)
+			bar:SetValue(level)
 
-		local r, g, b, a = CowmonsterUI.GetClassColor(class)
-		bar:SetStatusBarColor(r, g, b, a)
+			local r, g, b, a = CowmonsterUI.GetClassColor(class)
+			bar:SetStatusBarColor(r, g, b, a)
 
-		bar:Show()
+			bar:Show()
+
+			barCount = barCount + 1
+		end
 
 		if online then numOnline = numOnline + 1 end
 		numTotal = numTotal + 1
@@ -52,7 +58,7 @@ function InfoBarGuild_Refresh()
 		CowmonsterUI.ResizeColumn("InfoBarGuild", i)
 	end
 
-	CowmonsterUI.ResizeList("InfoBarGuild", index)
+	CowmonsterUI.ResizeList("InfoBarGuild", barCount)
 end
 
 function InfoBarGuild_OnEnter(self)
