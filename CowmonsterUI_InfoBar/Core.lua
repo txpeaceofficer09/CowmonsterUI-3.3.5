@@ -78,6 +78,7 @@ local InfoBarStrings = {
 		},
 	},
 	]]
+	--[[
 	{
 		["Name"] = "InfoBarSpellBonus",
 		["JustifyH"] = "LEFT",
@@ -85,6 +86,22 @@ local InfoBarStrings = {
 			["OnUpdate"] = "InfoBarSpellBonus_OnUpdate",
 			["OnEnter"] = "InfoBarSpellBonus_OnEnter",
 			["OnLeave"] = "InfoBarSpellBonus_OnLeave",
+		},
+	},
+	]]
+	{
+		["Name"] = "InfoBarBattleground",
+		["JustifyH"] = "LEFT",
+		["Scripts"] = {
+			["OnUpdate"] = "InfoBarBattleground_OnUpdate",
+			["OnEnter"] = "InfoBarBattleground_OnEnter",
+			["OnLeave"] = "InfoBarBattleground_OnLeave",
+		},
+		["Events"] = {
+			"UPDATE_BATTLEFIELD_SCORE",
+			"PARTY_MEMBERS_CHANGED",
+			"RAID_ROSTER_UPDATE",
+			"PLAYER_ENTERING_WORLD",
 		},
 	},
 	{

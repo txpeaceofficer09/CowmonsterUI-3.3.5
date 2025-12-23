@@ -82,7 +82,7 @@ end
 function InfoBarGuild_OnUpdate(self, elapsed)
 	self.timer = (self.timer or 0) + elapsed
 
-	if elapsed >= 1 then
+	if self.timer >= 1 then
 		local numOnline, numTotal, index = 0, 0, 1
 
 		while GetGuildRosterInfo(index) ~= nil do
@@ -95,5 +95,7 @@ function InfoBarGuild_OnUpdate(self, elapsed)
 		end
 
 		InfoBarSetText("InfoBarGuild", "Guild: %s / %s", numOnline, numTotal)
+
+		self.timer = 0
 	end
 end

@@ -11,6 +11,7 @@ Memory.lua
 LFG.lua
 --Avoidance.lua
 SpellBonus.lua
+Battleground.lua
 --Professions.lua
 Speed.lua
 Latency.lua
