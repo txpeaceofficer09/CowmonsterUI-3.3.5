@@ -1,6 +1,7 @@
 local f = CreateFrame("Frame", nil, UIParent)
 
-local ACTIONBAR_OFFSETX = 60
+--local ACTIONBAR_OFFSETX = 60
+local ACTIONBAR_OFFSETX = 120
 local ACTIONBAR_OFFSETY = 0
 local BAG_OFFSETY = 20
 
@@ -134,14 +135,37 @@ local function OnEvent(self, event, ...)
 
 			button:ClearAllPoints()
 			if i == 1 then
-				button:SetPoint("BOTTOMRIGHT", MainMenuBarBackpackButton, "TOPRIGHT", 0, 4)
+				button:SetPoint("BOTTOMRIGHT", MainMenuBarBackpackButton, "TOPRIGHT", 0, 2)
+			elseif i == 6 then
+				button:SetPoint("BOTTOMRIGHT", microButtons[1], "TOPRIGHT", 0, -20)
 			else
 				button:SetPoint("RIGHT", previousButton, "LEFT", -2, 0)
 			end
 		end
 
-		MainMenuBarBackpackButton:ClearAllPoints()
-		MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, BAG_OFFSETY)
+		bagButtons = {
+			MainMenuBarBackpackButton,
+			CharacterBag0Slot,
+			CharacterBag1Slot,
+			CharacterBag2Slot,
+			CharacterBag3Slot,
+			KeyRingButton
+		}
+
+		for i=1, #bagButtons do
+			local button, previousButton = bagButtons[i], bagButtons[i-1]
+
+			button:ClearAllPoints()
+			if i == 1 then
+				button:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, BAG_OFFSETY)
+			else
+				button:SetPoint("RIGHT", previousButton, "LEFT", -2, 0)
+			end
+			button:Show()
+		end
+
+		--MainMenuBarBackpackButton:ClearAllPoints()
+		--MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, BAG_OFFSETY)
 
 		self.menuOffsetLeft = MainMenuBar:GetLeft()
 		self.menuOffsetBottom = MainMenuBar:GetBottom()
