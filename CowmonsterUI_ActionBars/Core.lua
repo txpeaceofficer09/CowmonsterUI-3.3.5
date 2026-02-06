@@ -94,6 +94,55 @@ for id=13,24 do
 	b:Show()
 end
 
+local function MoveButtons()
+	local microButtons = {
+		CharacterMicroButton,
+		SpellbookMicroButton,
+		TalentMicroButton,
+		AchievementMicroButton,
+		QuestLogMicroButton,
+		SocialsMicroButton,
+		LFDMicroButton,
+		PVPMicroButton,
+		MainMenuMicroButton,
+		HelpMicroButton
+	}
+
+	for i=1, #microButtons do
+		local button, previousButton = microButtons[i], microButtons[i-1]
+
+		button:ClearAllPoints()
+		if i == 1 then
+			button:SetPoint("BOTTOMRIGHT", MainMenuBarBackpackButton, "TOPRIGHT", 0, 2)
+		elseif i == 6 then
+			button:SetPoint("BOTTOMRIGHT", microButtons[1], "TOPRIGHT", 0, -20)
+		else
+			button:SetPoint("RIGHT", previousButton, "LEFT", -2, 0)
+		end
+	end
+
+	bagButtons = {
+		MainMenuBarBackpackButton,
+		CharacterBag0Slot,
+		CharacterBag1Slot,
+		CharacterBag2Slot,
+		CharacterBag3Slot,
+		KeyRingButton
+	}
+
+	for i=1, #bagButtons do
+		local button, previousButton = bagButtons[i], bagButtons[i-1]
+
+		button:ClearAllPoints()
+		if i == 1 then
+			button:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, BAG_OFFSETY)
+		else
+			button:SetPoint("RIGHT", previousButton, "LEFT", -2, 0)
+		end
+		button:Show()
+	end
+end
+
 local function OnEvent(self, event, ...)
 	if event == "ACTIONBAR_PAGE_CHANGED" then
 		if GetActionBarPage() ~= 1 then	ChangeActionBarPage(1) end
@@ -117,52 +166,7 @@ local function OnEvent(self, event, ...)
 			_G["MultiBarRightButton"..i]:SetPoint("BOTTOM", _G["MultiBarBottomRightButton"..i], "TOP", 0, 4)
 		end
 
-		local microButtons = {
-			CharacterMicroButton,
-			SpellbookMicroButton,
-			TalentMicroButton,
-			AchievementMicroButton,
-			QuestLogMicroButton,
-			SocialsMicroButton,
-			LFDMicroButton,
-			PVPMicroButton,
-			MainMenuMicroButton,
-			HelpMicroButton
-		}
-
-		for i=1, #microButtons do
-			local button, previousButton = microButtons[i], microButtons[i-1]
-
-			button:ClearAllPoints()
-			if i == 1 then
-				button:SetPoint("BOTTOMRIGHT", MainMenuBarBackpackButton, "TOPRIGHT", 0, 2)
-			elseif i == 6 then
-				button:SetPoint("BOTTOMRIGHT", microButtons[1], "TOPRIGHT", 0, -20)
-			else
-				button:SetPoint("RIGHT", previousButton, "LEFT", -2, 0)
-			end
-		end
-
-		bagButtons = {
-			MainMenuBarBackpackButton,
-			CharacterBag0Slot,
-			CharacterBag1Slot,
-			CharacterBag2Slot,
-			CharacterBag3Slot,
-			KeyRingButton
-		}
-
-		for i=1, #bagButtons do
-			local button, previousButton = bagButtons[i], bagButtons[i-1]
-
-			button:ClearAllPoints()
-			if i == 1 then
-				button:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, BAG_OFFSETY)
-			else
-				button:SetPoint("RIGHT", previousButton, "LEFT", -2, 0)
-			end
-			button:Show()
-		end
+		MoveButtons()
 
 		--MainMenuBarBackpackButton:ClearAllPoints()
 		--MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, BAG_OFFSETY)
@@ -190,7 +194,7 @@ local function OnEvent(self, event, ...)
 			--self:UnregisterEvent("ADDON_LOADED")
 		end
 
-		if IsAddOnLoaded("CowmonsterUI_MiniMap") then
+		if IsAddOnLoaded("SteakMiniMap") then
 			BAG_OFFSETY = 170
 
 			MainMenuBarBackpackButton:ClearAllPoints()
@@ -199,6 +203,8 @@ local function OnEvent(self, event, ...)
 
 		ActionBarUpButton:Disable()
 		ActionBarDownButton:Disable()
+	elseif event == "UNIT_ENTERED_VEHICLE" or event == "VEHICLE_UPDATED" or event == "UNIT_EXITED_VEHICLE" then
+		self.lastExit = GetTime()
 	end
 end
 
@@ -223,6 +229,11 @@ local function OnUpdate(self, elapsed)
 			end
 		end
 
+		if self.lastExit and GetTime() - self.lastExit > 0.2 then
+			MoveButtons()
+			self.lastExit = nil
+		end
+
 		self.timer = 0
 	end
 end
@@ -234,6 +245,9 @@ f:RegisterEvent("UPDATE_BINDINGS")
 f:RegisterEvent("PLAYER_LOGIN")
 f:RegisterEvent("PLAYER_LOSES_VEHICLE_DATA")
 f:RegisterEvent("PLAYER_GAINS_VEHICLE_DATA")
+f:RegisterEvent("UNIT_EXITED_VEHICLE")
+f:RegisterEvent("UNIT_ENTERED_VHEICLE")
+f:RegisterEvent("VEHICLE_UPDATED")
 f:RegisterEvent("VARIABLES_LOADED")
 
 f:SetScript("OnEvent", OnEvent)

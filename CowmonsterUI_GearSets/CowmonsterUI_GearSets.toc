@@ -4,4 +4,5 @@
 ## Author: Cowmonster (http://www.wowinterface.com)
 ## Version: 1.0.0
 ## Dependencies: CowmonsterUI
+## OptionalDeps: SteakMiniMap, CowmonsterUI_ActionBars
 Core.lua

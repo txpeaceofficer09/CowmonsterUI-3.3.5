@@ -5,24 +5,24 @@ local function CreateEquipmentButtons()
 		local name, icon, setID = GetEquipmentSetInfo(i)
 
 		--local f = CreateFrame("Frame", "EQ"..i.."Button", UIParent)
-		local f = CreateFrame("Button", "EQ"..i.."Button", UIParent)
+		local btn = CreateFrame("Button", "EQ"..i.."Button", UIParent)
 
-		f:SetSize(24, 24)
+		btn:SetSize(24, 24)
 		if i == 1 then
-			f:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 152)
+			btn:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 200)
 		else
-			f:SetPoint("BOTTOMRIGHT", _G["EQ"..(i-1).."Button"], "BOTTOMLEFT", -2, 0)
+			btn:SetPoint("BOTTOMRIGHT", _G["EQ"..(i-1).."Button"], "BOTTOMLEFT", -2, 0)
 		end
 
-		f.name = name
-		f:CreateTexture(f:GetName().."Icon", "ARTWORK")
-		local t = _G[f:GetName().."Icon"]
+		btn.name = name
+		local t = btn:CreateTexture(btn:GetName().."Icon", "ARTWORK")
+		--local t = _G[btn:GetName().."Icon"]
 		t:SetAllPoints(f)
 		t:SetTexture(icon)
 		t:Show()
 
 		_G["EQ"..i.."ButtonIcon"]:SetTexture(icon)
-		f:SetScript("OnEnter", function(self, motion)
+		btn:SetScript("OnEnter", function(self, motion)
 			if motion == true then
 				GameTooltip:SetOwner(self)
 				GameTooltip:SetEquipmentSet(self.name)
@@ -30,12 +30,12 @@ local function CreateEquipmentButtons()
 			end
 		end)
 
-		f:SetScript("OnLeave", function(self)
+		btn:SetScript("OnLeave", function(self)
 			GameTooltip:Hide()
 			GameTooltip:ClearLines()
 		end)
 
-		f:SetScript("OnMouseUp", function(self, button)
+		btn:SetScript("OnMouseUp", function(self, button)
 			local equipped = UseEquipmentSet(self.name)
 			
 --			if equipped then
@@ -47,18 +47,7 @@ local function CreateEquipmentButtons()
 			DEFAULT_CHAT_FRAME:AddMessage(self.name.." equipped.", 0.5, 1, 1, 1)
 		end)
 
---		f:SetScript("OnEnter", function(self)
---			GameTooltip:ClearLines()
---			GameTooltip:SetText(self.name)
---			GameTooltip:Show()
---		end)
-
---		f:SetScript("OnLeave", function(self)
---			GameTooltip:Hide()
---			GameTooltip:ClearLines()
---		end)
-
-		f:Show()
+		btn:Show()
 	end
 end
 
@@ -67,6 +56,11 @@ f:SetScript("OnEvent", function(self, event, ...)
 		CreateEquipmentButtons()
 	elseif event == "EQUIPMENT_SETS_CHANGED" then
 		CreateEquipmentButtons()
+	elseif event == "ADDON_LOADED" then
+		--if IsAddOnLoaded("CowmonsterUI_ActionBars") then
+		--	EQ1Button:ClearAllPoints()
+		--	EQ1Button:SetPoint("BOTTOMRIGHT", SocialsMicroButton, "TOPRIGHT", 0, 0)
+		--end
 	end
 end)
 

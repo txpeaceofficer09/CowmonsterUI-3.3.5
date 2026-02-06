@@ -5,4 +5,5 @@
 ## Author: SoonBeSteak (https://www.trap-nine.com)
 ## Version: 1.0.4
 ## Dependencies: CowmonsterUI
+## OptionalDeps: SteakMiniMap
 Core.lua
