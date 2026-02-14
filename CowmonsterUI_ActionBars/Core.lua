@@ -171,6 +171,23 @@ local function OnEvent(self, event, ...)
 		--MainMenuBarBackpackButton:ClearAllPoints()
 		--MainMenuBarBackpackButton:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, BAG_OFFSETY)
 
+		--MainMenuBar:SetScale(MainMenuBar:GetScale()*0.9)
+		--[[
+		MainMenuBar:SetScale(0.8)
+		MultiBarBottomLeft:SetScale(MainMenuBar:GetScale())
+		MultiBarBottomRight:SetScale(MainMenuBar:GetScale())
+		MultiBarLeft:SetScale(MainMenuBar:GetScale())
+		]]
+		
+		for _, a in ipairs({MainMenuBar, MultiBarBottomLeft, MultiBarBottomRight, MultiBarLeft}) do
+			a:SetScale(0.8)
+		end
+
+		for i=1,12 do
+			_G["ExtraBarButton"..i]:SetScale(MainMenuBar:GetScale())
+			_G["MultiBarRightButton"..i]:SetScale(MainMenuBar:GetScale())
+		end
+
 		self.menuOffsetLeft = MainMenuBar:GetLeft()
 		self.menuOffsetBottom = MainMenuBar:GetBottom()
 	elseif event == "PLAYER_LOGIN" then
