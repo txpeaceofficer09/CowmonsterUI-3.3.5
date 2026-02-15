@@ -18,7 +18,8 @@ local f = CreateFrame("Frame", "CowmonsterUI", UIParent)
 
 local function OnEvent(self, event, ...)
 	if event == "PLAYER_ENTERING_WORLD" then
-		UIParent:SetScale(0.744)
+		--UIParent:SetScale(0.744)
+		UIParent:SetScale(0.9)
 		--UIParent:SetScale(1)
 		MainMenuBarLeftEndCap:Hide()
 		MainMenuBarRightEndCap:Hide()
