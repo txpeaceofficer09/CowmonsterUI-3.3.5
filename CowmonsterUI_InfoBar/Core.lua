@@ -17,7 +17,6 @@ local InfoBarStrings = {
 			"PLAYER_ENTERING_WORLD",
 		},
 	},
-	--[[
 	{
 		["Name"] = "InfoBarXP",
 		["JustifyH"] = "LEFT",
@@ -35,7 +34,6 @@ local InfoBarStrings = {
 			"GUILD_XP_UPDATE",
 		},
 	},
-	]]
 	{
 		["Name"] = "InfoBarMem",
 		["JustifyH"] = "LEFT",
@@ -57,6 +55,7 @@ local InfoBarStrings = {
 			"PLAYER_ENTERING_WORLD",
 		},
 	},
+	--[[
 	{
 		["Name"] = "InfoBarCoords",
 		["JustifyH"] = "LEFT",
@@ -67,6 +66,7 @@ local InfoBarStrings = {
 			"PLAYER_ENTERING_WORLD",
 		},
 	},
+	]]
 	--[[
 	{
 		["Name"] = "InfoBarAvoidance",
@@ -89,6 +89,7 @@ local InfoBarStrings = {
 		},
 	},
 	]]
+	--[[
 	{
 		["Name"] = "InfoBarBattleground",
 		["JustifyH"] = "LEFT",
@@ -104,6 +105,7 @@ local InfoBarStrings = {
 			"PLAYER_ENTERING_WORLD",
 		},
 	},
+	]]
 	{
 		["Name"] = "InfoBarProfessions",
 		["JustifyH"] = "LEFT",
@@ -133,10 +135,10 @@ local InfoBarStrings = {
 			"SPELL",
 			"NORMAL",
 			"TARGET",
-			"ZONE",
+			--"ZONE",
 			"CRITICAL",
 			"TARGET",
-			"ZONE",
+			--"ZONE",
 		},
 		["minVal"] = 0,
 		["maxVal"] = 100,
@@ -276,7 +278,9 @@ function CowmonsterUI.CreateBar(parent, index, minVal, maxVal)
 
         for i=1,list.columns,1 do
                 local t = bar:CreateFontString(("%sListBar%dText%d"):format(parent, index, i), "OVERLAY")
-                t:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE")
+                --t:SetFont("Fonts\\ARIALN.ttf", 12, "OUTLINE")
+		t:SetFont("Interface\\AddOns\\CowmonsterUI_InfoBar\\Audiowide-Regular.ttf", 10, "OUTLINE")
+
                 if i == 1 then
                         t:SetPoint("LEFT", bar, "LEFT", 2, 0)
                 else
@@ -337,7 +341,8 @@ f:SetBackdrop( { bgFile = "Interface\\DialogFrame\\UI-DialogBox-BackGround-Dark"
 for k, v in ipairs(InfoBarStrings) do
 	local b = CreateFrame("Button", v.Name, InfoBarFrame)
 	local s = b:CreateFontString(v.Name.."Text", "ARTWORK")
-	s:SetFont("Fonts\\ARIALN.ttf", 14, "OUTLINE")
+	--s:SetFont("Fonts\\ARIALN.ttf", 14, "OUTLINE")
+	s:SetFont("Interface\\AddOns\\CowmonsterUI_InfoBar\\Audiowide-Regular.ttf", 10, "OUTLINE")
 
 	s:SetAllPoints(b)
 

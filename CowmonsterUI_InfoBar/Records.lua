@@ -7,7 +7,8 @@ local mobFilter = {
 }
 
 local f = CreateFrame("Frame", "InfoBarRecordsList", InfoBarFrame)
-f.columns = 7 -- spell, normal, normTarget, normZone, critical, critTarget, critZone
+--f.columns = 7 -- spell, normal, normTarget, normZone, critical, critTarget, critZone
+f.columns = 5 -- spell, normal, normTarget, critical, critTarget
 f:SetFrameStrata("FULLSCREEN")
 f:SetBackdrop( { bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background", edgeFile = nil, tile = true, tileSize = 32, edgeSize = 0, insets = { left = 0, right = 0, top = 0, bottom = 0 } } )
 
@@ -39,10 +40,10 @@ function InfoBarRecords_Refresh()
 			_G[("InfoBarRecordsListBar%sText1"):format(0)]:SetText("SPELL")
 			_G[("InfoBarRecordsListBar%sText2"):format(0)]:SetText("NORMAL")
 			_G[("InfoBarRecordsListBar%sText3"):format(0)]:SetText("TARGET")
-			_G[("InfoBarRecordsListBar%sText4"):format(0)]:SetText("ZONE")
-			_G[("InfoBarRecordsListBar%sText5"):format(0)]:SetText("CRITICAL")
-			_G[("InfoBarRecordsListBar%sText6"):format(0)]:SetText("TARGET")
-			_G[("InfoBarRecordsListBar%sText7"):format(0)]:SetText("ZONE")
+			--_G[("InfoBarRecordsListBar%sText4"):format(0)]:SetText("ZONE")
+			_G[("InfoBarRecordsListBar%sText4"):format(0)]:SetText("CRITICAL")
+			_G[("InfoBarRecordsListBar%sText5"):format(0)]:SetText("TARGET")
+			--_G[("InfoBarRecordsListBar%sText7"):format(0)]:SetText("ZONE")
 		end
 
 		for k,v in ipairs(data) do
@@ -55,10 +56,10 @@ function InfoBarRecords_Refresh()
 			_G[("InfoBarRecordsListBar%sText1"):format(index)]:SetText(v.name)
 			_G[("InfoBarRecordsListBar%sText2"):format(index)]:SetText(CowmonsterUI.AddComma(v["norm"]))
 			_G[("InfoBarRecordsListBar%sText3"):format(index)]:SetText(v["normTarget"] or "")
-			_G[("InfoBarRecordsListBar%sText4"):format(index)]:SetText(v["normZone"] or "")
-			_G[("InfoBarRecordsListBar%sText5"):format(index)]:SetText(CowmonsterUI.AddComma(v["crit"]))
-			_G[("InfoBarRecordsListBar%sText6"):format(index)]:SetText(v["critTarget"] or "")
-			_G[("InfoBarRecordsListBar%sText7"):format(index)]:SetText(v["critZone"] or "")
+			--_G[("InfoBarRecordsListBar%sText4"):format(index)]:SetText(v["normZone"] or "")
+			_G[("InfoBarRecordsListBar%sText4"):format(index)]:SetText(CowmonsterUI.AddComma(v["crit"]))
+			_G[("InfoBarRecordsListBar%sText5"):format(index)]:SetText(v["critTarget"] or "")
+			--_G[("InfoBarRecordsListBar%sText7"):format(index)]:SetText(v["critZone"] or "")
 
 			index = index + 1
 
