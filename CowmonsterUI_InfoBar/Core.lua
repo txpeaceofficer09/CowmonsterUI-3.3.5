@@ -107,6 +107,13 @@ local InfoBarStrings = {
 	},
 	]]
 	{
+		["Name"] = "InfoBarLC",
+		["JustifyH"] = "LEFT",
+		["Scripts"] = {
+			["OnUpdate"] = "InfoBarLC_OnUpdate"
+		}
+	},
+	{
 		["Name"] = "InfoBarProfessions",
 		["JustifyH"] = "LEFT",
 		["Scripts"] = {

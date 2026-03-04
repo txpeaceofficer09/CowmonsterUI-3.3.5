@@ -1,74 +1,71 @@
-local f = CreateFrame("Frame", nil, UIParent)
+local frame = CreateFrame("Frame", "SteakGearSetsAnchor", UIParent)
 
-local function CreateEquipmentButtons()
-	for i=1,GetNumEquipmentSets() do
-		local name, icon, setID = GetEquipmentSetInfo(i)
+frame:SetSize(200, 24)
+frame:SetPoint("CENTER", 300, 0)
+frame:SetMovable(true)
+frame:EnableMouse(true)
+frame:RegisterForDrag("LeftButton")
+frame:SetScript("OnDragStart", frame.StartMoving)
+frame:SetScript("OnDragStop", frame.StopMovingOrSizing)
 
-		--local f = CreateFrame("Frame", "EQ"..i.."Button", UIParent)
-		local f = CreateFrame("Button", "EQ"..i.."Button", UIParent)
+local bg = frame:CreateTexture(nil, "BACKGROUND")
+bg:SetTexture(0, 0, 0, 0.5)
+bg:SetAllPoints(frame)
 
-		f:SetSize(24, 24)
-		if i == 1 then
-			f:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0, 152)
-		else
-			f:SetPoint("BOTTOMRIGHT", _G["EQ"..(i-1).."Button"], "BOTTOMLEFT", -2, 0)
-		end
+local buttons = {}
 
-		f.name = name
-		f:CreateTexture(f:GetName().."Icon", "ARTWORK")
-		local t = _G[f:GetName().."Icon"]
-		t:SetAllPoints(f)
-		t:SetTexture(icon)
-		t:Show()
-
-		_G["EQ"..i.."ButtonIcon"]:SetTexture(icon)
-		f:SetScript("OnEnter", function(self, motion)
-			if motion == true then
-				GameTooltip:SetOwner(self)
-				GameTooltip:SetEquipmentSet(self.name)
-				GameTooltip:Show()
-			end
-		end)
-
-		f:SetScript("OnLeave", function(self)
-			GameTooltip:Hide()
-			GameTooltip:ClearLines()
-		end)
-
-		f:SetScript("OnMouseUp", function(self, button)
-			local equipped = UseEquipmentSet(self.name)
-			
---			if equipped then
---				DEFAULT_CHAT_FRAME:AddMessage(self.name.." already equipped.", 0, 0.5, 1, 1)
---			else
---				DEFAULT_CHAT_FRAME:AddMessage("Equipping "..self.name..".", 0, 1, 1, 1)
---			end
-
-			DEFAULT_CHAT_FRAME:AddMessage(self.name.." equipped.", 0.5, 1, 1, 1)
-		end)
-
---		f:SetScript("OnEnter", function(self)
---			GameTooltip:ClearLines()
---			GameTooltip:SetText(self.name)
---			GameTooltip:Show()
---		end)
-
---		f:SetScript("OnLeave", function(self)
---			GameTooltip:Hide()
---			GameTooltip:ClearLines()
---		end)
-
-		f:Show()
+frame:SetScript("OnEvent", function(self, event, ...)
+	for _, button in ipairs(buttons) do
+		button:Hide()
 	end
-end
 
-f:SetScript("OnEvent", function(self, event, ...)
-	if event == "PLAYER_ENTERING_WORLD" then
-		CreateEquipmentButtons()
-	elseif event == "EQUIPMENT_SETS_CHANGED" then
-		CreateEquipmentButtons()
+	self:SetWidth(GetNumEquipmentSets()*26)
+
+	for i=1,GetNumEquipmentSets() do
+		local button = buttons[i]
+		
+		if not button then
+			button = CreateFrame("Button", nil, self)
+			button:SetSize(24, 24)
+			button:SetPoint("LEFT", self, "LEFT", ((i-1)*26), 0)
+			
+			button.icon = button:CreateTexture(nil, "BACKGROUND")
+			button.icon:SetAllPoints(button)
+			
+			button:SetScript("OnEnter", function(self, motion)
+				if motion then
+					GameTooltip:SetOwner(button)
+					GameTooltip:SetEquipmentSet(self.name)
+					GameTooltip:Show()
+				end
+			end)
+			
+			button:SetScript("OnLeave", function(self)
+				GameTooltip:Hide()
+				GameTooltip:ClearLines()
+			end)
+			
+			button:SetScript("OnMouseUp", function(self, button)
+				local equipped = UseEquipmentSet(self.name)
+				
+				DEFAULT_CHAT_FRAME:AddMessage(self.name.." equipped.", 0.5, 1, 1, 1)
+			end)
+			
+			button:RegisterForDrag("LeftButton")
+			button:SetScript("OnDragStart", frame.StartMoving)
+			button:SetScript("OnDragStop", frame.StopMovingOrSizing)
+			
+			buttons[i] = button
+		end
+		
+		local name, icon, setID = GetEquipmentSetInfo(i)
+		
+		button.name = name
+		button.icon:SetTexture(icon)
+		
+		button:Show()
 	end
 end)
 
-f:RegisterEvent("EQUIPMENT_SETS_CHANGED")
-f:RegisterEvent("PLAYER_ENTERING_WORLD")
+frame:RegisterEvent("EQUIPMENT_SETS_CHANGED")
+frame:RegisterEvent("PLAYER_ENTERING_WORLD")

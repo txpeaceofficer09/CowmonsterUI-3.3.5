@@ -1,4 +1,4 @@
-local MAX_PLAYER_LEVEL = 70
+local MAX_PLAYER_LEVEL = 80
 
 function InfoBarXP_OnEnter(self)
 	if UnitAffectingCombat("player") then return end
@@ -73,7 +73,8 @@ function InfoBarXP_Update()
 --	local db = CowmonsterUIDB[playerRealm][playerName].Settings or {}
 --	InfoBarXPtoggle = InfoBarXPtoggle or "xp"
 
-	if UnitLevel("player") == MAX_PLAYER_LEVEL and InfoBarXPtoggle == "xp" then InfoBarXPtoggle = "reputation" end
+	--if UnitLevel("player") == MAX_PLAYER_LEVEL and InfoBarXPtoggle == "xp" then InfoBarXPtoggle = "reputation" end
+	if UnitXPMax("player") <= 0 and InfoBarXPtoggle == "xp" then InfoBarXPtoggle = "reputation" end
 
 	--if UnitLevel("player") == MAX_PLAYER_LEVEL and InfoBarXPtoggle == "xp" then InfoBarXPtoggle = "reputation" end
 
